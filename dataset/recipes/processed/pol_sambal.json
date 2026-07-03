@@ -1,0 +1,13 @@
+{
+    "dish_name": "pol_sambal",
+    "ingredients": [
+      {"name": "chopped dried red finger-length chilli"},
+      {"name": "finely chopped onion"},
+      {"name": "pepper"},
+      {"name": "dried Maldive Fish or dried prawns/fish"},
+      {"name": "freshly grated coconut"},
+      {"name": "lime juice"},
+      {"name": "salt"}
+    ],
+    "description": "Freshly grated coconut ground with chillies, onion, Maldive fish, and seasoned with lime juice and salt"
+  }

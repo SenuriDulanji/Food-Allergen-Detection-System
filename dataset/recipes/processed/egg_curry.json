@@ -1,0 +1,20 @@
+{
+  "dish_name": "egg_curry",
+  "ingredients": [
+    {"name": "hard-boiled eggs"},
+    {"name": "onion"},
+    {"name": "garlic"},
+    {"name": "green chili"},
+    {"name": "curry leaves"},
+    {"name": "pandan leaf"},
+    {"name": "mustard seeds"},
+    {"name": "fenugreek seeds"},
+    {"name": "Sri Lankan roasted curry powder"},
+    {"name": "turmeric powder"},
+    {"name": "chili powder"},
+    {"name": "coconut milk"},
+    {"name": "cooking oil"},
+    {"name": "salt"}
+  ],
+  "description": "Hard-boiled eggs gently simmered in a fragrant and gently spiced coconut milk gravy."
+}

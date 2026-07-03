@@ -1,0 +1,128 @@
+# ========================================
+# Python
+# ========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+.venv*/
+
+# ========================================
+# IDE & Editors
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ========================================
+# Environment Variables
+# ========================================
+.env
+.env.local
+.env.*.local
+
+# ========================================
+# Logs & Temporary Files
+# ========================================
+*.log
+logs/
+*.log.*
+
+# ========================================
+# Jupyter Notebooks
+# ========================================
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+**/.ipynb_checkpoints/*
+*.nbconvert.ipynb
+
+# ========================================
+# Dataset & Large Files
+# ========================================
+dataset/images/**/*.jpg
+dataset/images/**/*.jpeg
+dataset/images/**/*.png
+!dataset/images/*/.gitkeep
+
+# Large model files or caches
+*.h5
+*.hdf5
+*.onnx
+*.pt
+*.pth
+chroma_db/
+vector_store/
+*.bin
+*.safetensors
+
+# ========================================
+# Frontend (Next.js)
+# ========================================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.vercel/
+frontend/coverage/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# ========================================
+# OS Generated
+# ========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# ========================================
+# Others
+# ========================================
+*.sqlite3
+*.db
+*.bak
+*.tmp
+cache/
+temp/
+tmp/
+
+# ========================================
+# Optional: Keep empty folders
+# ========================================
+!dataset/images/.gitkeep
+!dataset/recipes/raw/.gitkeep
+!dataset/recipes/processed/.gitkeep
+!experiments/.gitkeep

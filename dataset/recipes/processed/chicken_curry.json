@@ -1,0 +1,21 @@
+{
+    "dish_name": "chicken_curry",
+    "ingredients": [
+      {"name": "chilli powder"},
+      {"name": "fennel powder"},
+      {"name": "coriander powder"},
+      {"name": "chicken"},
+      {"name": "salt"},
+      {"name": "vinegar"},
+      {"name": "oil"},
+      {"name": "onion"},
+      {"name": "garlic"},
+      {"name": "fresh ginger"},
+      {"name": "curry leaves"},
+      {"name": "lemongrass"},
+      {"name": "cinnamon stick"},
+      {"name": "mustard seeds"},
+      {"name": "coconut milk"}
+    ],
+    "description": "Chicken pieces marinated in roasted spices and gently stir-fried with aromatics and coconut milk"
+  }
