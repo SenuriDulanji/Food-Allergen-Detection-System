@@ -1,0 +1,24 @@
+{
+  "dish_name": "milk_rice",
+  "aliases": [
+    "kiri_bath"
+  ],
+  "ingredients": [
+    {
+      "name": "uncooked glutinous rice"
+    },
+    {
+      "name": "thin coconut milk"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "thick coconut milk"
+    },
+    {
+      "name": "oil"
+    }
+  ],
+  "description": "A traditional ceremonial dish made by cooking rice in coconut milk until creamy and setting it into flat diamond shapes."
+}

@@ -1,0 +1,19 @@
+{
+  "dish_name": "pittu",
+  "aliases": [],
+  "ingredients": [
+    {
+      "name": "roasted rice flour"
+    },
+    {
+      "name": "freshly grated coconut"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "water"
+    }
+  ],
+  "description": "Steamed cylindrical rice-flour rolls made by mixing flour and fresh coconut, traditionally steamed in a bamboo mould."
+}

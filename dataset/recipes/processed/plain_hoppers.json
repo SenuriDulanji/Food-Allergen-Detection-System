@@ -1,0 +1,28 @@
+{
+  "dish_name": "plain_hoppers",
+  "aliases": [
+    "appa",
+    "appam"
+  ],
+  "ingredients": [
+    {
+      "name": "rice flour"
+    },
+    {
+      "name": "palm toddy or dried yeast"
+    },
+    {
+      "name": "sugar"
+    },
+    {
+      "name": "thin coconut milk"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "thick coconut milk"
+    }
+  ],
+  "description": "Small, bowl-shaped rice flour pancakes with a soft, bready center and crisp brown edges, fermented overnight."
+}

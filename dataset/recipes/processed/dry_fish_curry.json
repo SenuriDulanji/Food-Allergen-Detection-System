@@ -1,0 +1,45 @@
+{
+  "dish_name": "dry_fish_curry",
+  "aliases": [
+    "karawala_curry"
+  ],
+  "ingredients": [
+    {
+      "name": "dry fish (karawala)"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "green chili"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "pandan leaf"
+    },
+    {
+      "name": "tomato"
+    },
+    {
+      "name": "chili powder"
+    },
+    {
+      "name": "unroasted curry powder"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "coconut milk"
+    },
+    {
+      "name": "oil"
+    }
+  ],
+  "description": "Salty, umami-rich dried fish pieces cooked in a spicy and creamy coconut gravy."
+}

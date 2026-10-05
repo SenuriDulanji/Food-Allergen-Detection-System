@@ -1,0 +1,37 @@
+{
+  "dish_name": "isso_vade",
+  "aliases": [
+    "isso_vada",
+    "isso_vadai"
+  ],
+  "ingredients": [
+    {
+      "name": "masoor (Mysore) dhal"
+    },
+    {
+      "name": "green finger-length chilli"
+    },
+    {
+      "name": "dried red finger-length chillies"
+    },
+    {
+      "name": "onions"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "prawns"
+    },
+    {
+      "name": "salt and pepper"
+    },
+    {
+      "name": "fresh large prawns"
+    },
+    {
+      "name": "oil"
+    }
+  ],
+  "description": "A popular Sri Lankan snack of spiced dhal patties with a prawn firmly embedded in the center, deep-fried until golden brown."
+}

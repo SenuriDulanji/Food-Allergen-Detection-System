@@ -53,7 +53,6 @@ ALLERGEN_KB: dict[str, list[str]] = {
     "tree_nuts": [
         "cashew", "almond", "walnut", "pistachio", "pecan",
         "hazelnut", "macadamia", "brazil nut", "pine nut",
-        "coconut",            # classified as tree nut by FDA
     ],
 
     "soy": [
@@ -64,7 +63,6 @@ ALLERGEN_KB: dict[str, list[str]] = {
     "milk_dairy": [
         "milk", "cheese", "butter", "cream", "yogurt", "curd",
         "ghee", "paneer", "whey", "lactose",
-        "coconut milk",       # not dairy, but flagged separately — see note below
     ],
 
     "sesame": [
@@ -105,6 +103,56 @@ ALLERGEN_KB: dict[str, list[str]] = {
             "chili", "chilli", "pepper", "fenugreek", "cumin",
             "coriander", "turmeric", "cardamom",
         ],
+        
+    # ── Dataset Specific Allergens ────────────────────────────────────────── #
+    
+    "prawns_shrimp": [
+        "prawn", "shrimp", "isso",
+    ],
+    
+    "crab": [
+        "crab", "kakuluwo",
+    ],
+    
+    "cuttlefish_squid": [
+        "cuttlefish", "squid", "dallo",
+    ],
+    
+    "dry_fish_sprats": [
+        "dry fish", "sprat", "karawala", "halmassa", "jaadi",
+    ],
+    
+    "tuna_balaya_kelawalla": [
+        "tuna", "balaya", "kelawalla",
+    ],
+    
+    "beef": [
+        "beef", "harak mas",
+    ],
+    
+    "pork": [
+        "pork", "pig", "bacon", "ham", "uru mas",
+    ],
+    
+    "lamb_mutton": [
+        "lamb", "mutton", "goat", "sheep", "elu mas",
+    ],
+    
+    "coconut": [
+        "coconut", "pol",
+    ],
+    
+    "spicy_oily": [
+        "spicy", "oil", "oily", "chili", "chilli", "pepper", "deep fried",
+    ],
+    
+    "fenugreek": [
+        "fenugreek", "uluhaal",
+    ],
+    
+    "cumin": [
+        "cumin", "suduru", "mahaduru",
+    ],
 }
 
 # Re-map "coconut milk" out of dairy for internal use — it's only flagged
@@ -139,11 +187,17 @@ def detect_allergens_in_ingredient(
         [c.lower() for c in user_allergens] if user_allergens else list(ALLERGEN_KB.keys())
     )
 
-    for category, keywords in ALLERGEN_KB.items():
-        if category.lower() not in categories_to_check:
-            continue
+    for category in categories_to_check:
+        keywords = ALLERGEN_KB.get(category, [category]) # Fallback to using the category name itself as the keyword
         for kw in keywords:
             if kw.lower() in ingredient_lower:
+                # Handle false positives for milk_dairy where keywords match plant-based substitutes
+                if category == "milk_dairy":
+                    if kw.lower() in ["milk", "cream", "butter"] and any(plant in ingredient_lower for plant in ["coconut", "soy", "soya", "almond", "oat", "rice", "cashew"]):
+                        continue  # Skip plant milks, plant creams, and plant butters
+                    if kw.lower() == "curd" and "bean" in ingredient_lower:
+                        continue  # Skip bean curd (tofu) as it's soy, not dairy
+                        
                 found.append({
                     "allergen_category": category,
                     "triggered_by": [ingredient],

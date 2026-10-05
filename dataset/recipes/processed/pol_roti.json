@@ -1,0 +1,28 @@
+{
+  "dish_name": "pol roti",
+  "aliases": [],
+  "ingredients": [
+    {
+      "name": "dry-roasted rice flour"
+    },
+    {
+      "name": "freshly grated coconut"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "water"
+    },
+    {
+      "name": "green finger-length chilli"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "curry leaves"
+    }
+  ],
+  "description": "A flatbread dough mixed with grated coconut and aromatics like chillies, onions and curry leaves, then seared on a hot griddle until cooked"
+}

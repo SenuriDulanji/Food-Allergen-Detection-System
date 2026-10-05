@@ -2,7 +2,7 @@
 services/ml_risk_service.py — Allergen Risk Prediction via ML Models + Apriori Rules.
 
 Unified Intelligence Engine (Layer 4 of the detection pipeline):
-  • ML Engine  — Loads per-ingredient XGBoost SMOTE pipelines (*.joblib) and predicts
+  • ML Engine  — Loads per-ingredient  logistic regression pipelines (*.joblib) and predicts
                  clinical risk level (0 = safe, 1-3 = risk) for each detected ingredient
                  based on the user's demographic / medical profile vector.
   • Safety Net — Applies validated Apriori cross-reactivity rules to raise additional
@@ -248,7 +248,7 @@ INGREDIENT_SYNONYMS: dict[str, str] = {
 # --------------------------------------------------------------------------- #
 #  Feature columns — must match exactly what was used during training          #
 # --------------------------------------------------------------------------- #
-# These are the demographic / medical features that the XGBoost models expect.
+# These are the demographic / medical features that the  logistic regression models expect.
 # Order is critical — it must be identical to `features_to_keep` computed
 # during training (Spearman ≥ 0.15 filter).  The common safe subset that
 # always survives the filter is listed here; any extra one-hot columns will
@@ -265,16 +265,12 @@ BASE_FEATURE_COLS: list[str] = [
     "med_cond_none_of_these",
     "med_cond_not_sure",
     "family_has_history",
-    "family_asthma",
-    "family_eczema",
     "family_allergy_beef",
     "family_allergy_pork",
     "family_allergy_sausage",
     "family_allergy_red_meat",
     "family_allergy_seafood",
     "family_allergy_dairy",
-    "family_allergy_nuts",
-    "family_allergy_egg",
     "family_allergy_tomato",
     "family_allergy_pineapple",
     "family_allergy_avocado",
@@ -282,26 +278,38 @@ BASE_FEATURE_COLS: list[str] = [
     "family_allergy_flour",
 ]
 
-# Province one-hot prefixes supported by the training data
+# Province one-hot prefixes matching exactly fit feature names
 _PROVINCE_COLS = [
-    "province_central", "province_eastern", "province_north_central",
-    "province_north_western", "province_northern", "province_sabaragamuwa",
-    "province_southern", "province_uva", "province_western",
+    "province_Central Province", 
+    "province_North Western Province", 
+    "province_Sabaragamuwa Province", 
+    "province_Uva Province", 
+    "province_Western Province"
 ]
-# Blood-type one-hot prefixes
+# Blood-type one-hot prefixes matching exactly fit feature names
 _BLOOD_TYPE_COLS = [
-    "blood_type_a+", "blood_type_a-", "blood_type_ab+", "blood_type_ab-",
-    "blood_type_b+", "blood_type_b-", "blood_type_o+", "blood_type_o-",
+    "blood_type_A+", 
+    "blood_type_A-", 
+    "blood_type_AB+", 
+    "blood_type_B+", 
+    "blood_type_I don't know / Not sure", 
+    "blood_type_O+", 
+    "blood_type_O-"
 ]
-# Dietary pattern one-hot prefixes
+# Dietary pattern one-hot prefixes matching exactly fit feature names
 _DIETARY_COLS = [
-    "dietary_pattern_non_vegetarian", "dietary_pattern_pescatarian",
-    "dietary_pattern_vegan", "dietary_pattern_vegetarian",
+    "dietary_pattern_Omnivore (Eats everything)", 
+    "dietary_pattern_Vegetarian (Eats dairy/eggs, no meat)"
 ]
-# Work-environment one-hot prefixes
+# Work-environment one-hot prefixes matching exactly fit feature names
 _WORK_ENV_COLS = [
-    "work_env_agriculture", "work_env_food_industry",
-    "work_env_healthcare", "work_env_office", "work_env_other",
+    "work_env_agricultural_or_plant_materials", 
+    "work_env_chemicals_or_strong_fumes", 
+    "work_env_continuous_air_conditioning", 
+    "work_env_dust_or_strong_pollutants", 
+    "work_env_extreme_heat_or_direct_sunlight", 
+    "work_env_none_of_the_above", 
+    "work_env_standard_home_environment_work_from_home___remote"
 ]
 
 ALL_POSSIBLE_FEATURES = (
@@ -482,28 +490,73 @@ def build_feature_vector(user_profile: dict[str, Any]) -> pd.DataFrame:
     for col in BASE_FEATURE_COLS:
         if col in user_profile:
             val = user_profile[col]
-            row[col] = float(val) if val is not None else 0.0
+            if val is None:
+                row[col] = 0.0
+            elif col == "gender":
+                if isinstance(val, str):
+                    v = val.strip().lower()
+                    row[col] = 1.0 if v == "male" else (0.0 if v == "female" else 2.0)
+                else:
+                    row[col] = float(val)
+            elif col == "age":
+                try:
+                    num_age = float(val)
+                    # If raw age in years (e.g. 25), scale to [0, 1] using survey bounds [14, 82]
+                    if num_age > 1.0:
+                        row[col] = float(np.clip((num_age - 14.0) / 68.0, 0.0, 1.0))
+                    else:
+                        row[col] = max(0.0, num_age)
+                except (ValueError, TypeError):
+                    row[col] = 0.0
+            else:
+                if isinstance(val, bool):
+                    row[col] = 1.0 if val else 0.0
+                elif isinstance(val, str):
+                    v = val.strip().lower()
+                    row[col] = 1.0 if v in ("1", "true", "yes", "y") else 0.0
+                else:
+                    try:
+                        row[col] = float(val)
+                    except (ValueError, TypeError):
+                        row[col] = 0.0
 
     # ── convenience one-hot expanders ──────────────────────────────────── #
     if "province" in user_profile and user_profile["province"]:
-        prov_key = f"province_{user_profile['province'].lower().replace(' ', '_')}"
-        if prov_key in row:
-            row[prov_key] = 1.0
+        prov_val = user_profile["province"].strip().lower()
+        for col in _PROVINCE_COLS:
+            if prov_val in col.lower():
+                row[col] = 1.0
+                break
 
     if "blood_type" in user_profile and user_profile["blood_type"]:
-        bt_key = f"blood_type_{user_profile['blood_type'].lower()}"
-        if bt_key in row:
-            row[bt_key] = 1.0
+        bt_val = user_profile["blood_type"].strip().lower()
+        for col in _BLOOD_TYPE_COLS:
+            if bt_val in col.lower() or (bt_val in ["not sure", "don't know", "i don't know / not sure"] and "i don't know" in col.lower()):
+                row[col] = 1.0
+                break
 
     if "dietary_pattern" in user_profile and user_profile["dietary_pattern"]:
-        dp_key = f"dietary_pattern_{user_profile['dietary_pattern'].lower().replace(' ', '_')}"
-        if dp_key in row:
-            row[dp_key] = 1.0
+        dp_val = user_profile["dietary_pattern"].strip().lower()
+        # Find first partial match
+        # e.g., "omnivore" matches "dietary_pattern_Omnivore (Eats everything)"
+        for col in _DIETARY_COLS:
+            if dp_val[:8] in col.lower():
+                row[col] = 1.0
+                break
 
     if "work_env" in user_profile and user_profile["work_env"]:
-        we_key = f"work_env_{user_profile['work_env'].lower().replace(' ', '_')}"
-        if we_key in row:
-            row[we_key] = 1.0
+        we_val = user_profile["work_env"].strip().lower()
+        for col in _WORK_ENV_COLS:
+            clean_suf = col.replace("work_env_", "").replace("_", " ").lower()
+            if we_val[:6] in clean_suf or clean_suf[:6] in we_val:
+                row[col] = 1.0
+                break
+
+    if "family_allergies" in user_profile and user_profile["family_allergies"]:
+        for alg in user_profile["family_allergies"]:
+            fa_key = f"family_allergy_{alg.strip().lower()}"
+            if fa_key in row:
+                row[fa_key] = 1.0
 
     # Preserve any pre-expanded one-hot columns already in user_profile
     for col in ALL_POSSIBLE_FEATURES:
@@ -590,11 +643,16 @@ def predict_dish_safety(
         full_report["models_evaluated"] += 1
 
         try:
-            risk_pred = int(model.predict(X)[0])
+            if hasattr(model, "feature_names_in_"):
+                X_model = X.reindex(columns=model.feature_names_in_, fill_value=0.0)
+            else:
+                X_model = X
+
+            risk_pred = int(model.predict(X_model)[0])
 
             if risk_pred > 0:
                 try:
-                    proba = float(model.predict_proba(X)[0][1])
+                    proba = float(model.predict_proba(X_model)[0][1])
                     confidence_pct = f"{proba * 100:.1f}%"
                 except Exception:
                     confidence_pct = "N/A"
@@ -605,9 +663,9 @@ def predict_dish_safety(
                     "risk_level": risk_pred,
                     "confidence": confidence_pct,
                     "msg": (
-                        f"⚠️ Clinical risk detected for '{ingredient}' "
+                        f"⚠️ Heightened sensitivity risk detected for '{ingredient}' "
                         f"(resolved → '{resolved_key}', confidence: {confidence_pct}). "
-                        "Your demographic profile suggests a heightened reaction probability."
+                        "Your self-reported profile indicates a statistical risk (pilot indicator, not a clinical allergy diagnosis)."
                     ),
                 })
                 logger.info(

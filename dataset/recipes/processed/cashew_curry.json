@@ -1,18 +1,45 @@
 {
   "dish_name": "cashew_curry",
+  "aliases": [
+    "kadju_curry"
+  ],
   "ingredients": [
-    {"name": "raw cashews"},
-    {"name": "onion"},
-    {"name": "green chili"},
-    {"name": "garlic"},
-    {"name": "curry leaves"},
-    {"name": "pandan leaf"},
-    {"name": "fenugreek seeds"},
-    {"name": "cinnamon stick"},
-    {"name": "Sri Lankan curry powder"},
-    {"name": "turmeric powder"},
-    {"name": "coconut milk"},
-    {"name": "salt"}
+    {
+      "name": "raw cashews"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "green chili"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "pandan leaf"
+    },
+    {
+      "name": "fenugreek seeds"
+    },
+    {
+      "name": "cinnamon stick"
+    },
+    {
+      "name": "Sri Lankan curry powder"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "coconut milk"
+    },
+    {
+      "name": "salt"
+    }
   ],
   "description": "A creamy, mild Sri Lankan curry made with soaked cashew nuts simmered in rich coconut milk and aromatic spices."
 }

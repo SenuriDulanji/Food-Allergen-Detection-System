@@ -1,0 +1,16 @@
+index,image,ground_truth,top1_pred,top3_preds,top1_correct,top3_correct,inference_time_s
+1,dataset\test-images\Unseen Data\koththu\10008.jpeg,koththu,koththu,koththu|pol_roti|kos_curry,True,True,20.5413
+2,dataset\test-images\Unseen Data\koththu\10013.jpeg,koththu,koththu,koththu|pol_roti|kos_curry,True,True,27.9430
+3,dataset\test-images\Unseen Data\koththu\10015.jpg,koththu,koththu,koththu|pol_roti|kos_curry,True,True,20.7480
+4,dataset\test-images\Unseen Data\koththu\10016.jpg,koththu,kottu_roti,kottu_roti|pol_roti|kos_curry,False,False,80.2691
+5,dataset\test-images\Unseen Data\koththu\10018.jpg,koththu,koththu,koththu|pol_roti|kos_curry,True,True,7.8721
+6,dataset\test-images\Unseen Data\pumpkin_curry\10001.jpeg,pumpkin_curry,batu_moju,batu_moju|karawila_curry|polos_curry,False,False,11.5523
+7,dataset\test-images\Unseen Data\pumpkin_curry\10003.jpg,pumpkin_curry,potato_curry,potato_curry|dell_curry|fish_curry,False,False,12.6781
+8,dataset\test-images\Unseen Data\pumpkin_curry\10004.jpg,pumpkin_curry,kos_curry,kos_curry|dell_curry|potato_curry,False,False,9.0317
+9,dataset\test-images\Unseen Data\pumpkin_curry\10014.jpg,pumpkin_curry,batu_moju,batu_moju|karawila_curry|polos_curry,False,False,8.1170
+10,dataset\test-images\Unseen Data\pumpkin_curry\10020.jpg,pumpkin_curry,batu_moju,batu_moju|karawila_curry|polos_curry,False,False,12.6009
+11,dataset\test-images\Unseen Data\seeni_sambol\10001.jpg,seeni_sambol,seeni_sambol,seeni_sambol|batu_moju|pol_sambal,True,True,13.3640
+12,dataset\test-images\Unseen Data\seeni_sambol\10002.jpg,seeni_sambol,seeni_sambol,seeni_sambol|batu_moju|pol_sambal,True,True,12.2172
+13,dataset\test-images\Unseen Data\seeni_sambol\10003.jpg,seeni_sambol,batu_moju,batu_moju|pol_sambal|polos_curry,False,False,7.4357
+14,dataset\test-images\Unseen Data\seeni_sambol\10004.jpg,seeni_sambol,batu_moju,batu_moju|pol_sambal|polos_curry,False,False,15.7129
+15,dataset\test-images\Unseen Data\seeni_sambol\10005.jpg,seeni_sambol,batu_moju,batu_moju|pol_sambal|polos_curry,False,False,5.5324

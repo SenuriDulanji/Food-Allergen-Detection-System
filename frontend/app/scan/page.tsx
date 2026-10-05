@@ -5,18 +5,10 @@ import {
   Upload, X, ScanLine, AlertTriangle, CheckCircle2, ChevronDown,
   ChevronUp, Info, Zap, Shield, Brain, Loader2, ImageIcon,
 } from "lucide-react";
-import { scanDish, listAllergens } from "@/lib/api";
+import { scanDish, listAllergens, getUser } from "@/lib/api";
 import type { ScanResponse, AllergenMatch, ClinicalAlert, SafetyNetWarning } from "@/lib/types";
 
-// ─── Confidence badge ────────────────────────────────────────────────────────
-function ConfidenceBadge({ level }: { level: string }) {
-  const styles: Record<string, string> = {
-    high: "chip-success",
-    medium: "chip-warning",
-    low: "chip-danger",
-  };
-  return <span className={`chip ${styles[level] ?? "chip-neutral"}`}>{level} confidence</span>;
-}
+// Removed ConfidenceBadge as it caused confusion with Risk level
 
 // ─── Source badge ────────────────────────────────────────────────────────────
 function SourceBadge({ source }: { source: string }) {
@@ -38,13 +30,33 @@ function SourceBadge({ source }: { source: string }) {
 }
 
 // ─── Scan Results component ──────────────────────────────────────────────────
-function ScanResults({ result }: { result: ScanResponse }) {
+function ScanResults({ result, userAllergens }: { result: ScanResponse; userAllergens: string[] }) {
   const [showIngredients, setShowIngredients] = useState(false);
   const [showML, setShowML] = useState(true);
+  const [showReadMore, setShowReadMore] = useState(false);
 
   const safetyColor = result.is_safe
     ? "border-emerald-500/30 bg-emerald-500/5"
     : "border-red-500/30 bg-red-500/5";
+
+  // Only show risk when detected allergens actually overlap with user's profile allergens
+  const userCats = new Set(userAllergens.map((a) => a.toLowerCase()));
+  const matchingAllergens = (result.detected_allergens ?? []).filter((a) =>
+    userCats.has(a.allergen_category.toLowerCase())
+  );
+
+  let maxRiskStr = null;
+  if (matchingAllergens.length > 0) {
+    // Detected allergens match user's profile → definite risk
+    maxRiskStr = "100% (Known)";
+  } else if (result.ml_risk_report?.clinical_alerts?.length > 0) {
+    const probs = result.ml_risk_report.clinical_alerts
+      .map((a) => parseFloat(a.confidence.replace("%", "")))
+      .filter((n) => !isNaN(n));
+    if (probs.length > 0) {
+      maxRiskStr = `${Math.max(...probs).toFixed(1)}% (ML)`;
+    }
+  }
 
   return (
     <div className="space-y-8 fade-in">
@@ -61,7 +73,11 @@ function ScanResults({ result }: { result: ScanResponse }) {
               <h2 className="text-xl font-bold capitalize">
                 {result.identified_dish.replace(/_/g, " ")}
               </h2>
-              <ConfidenceBadge level={result.confidence} />
+              {maxRiskStr && (
+                <span className="chip chip-danger font-bold">
+                  Max Risk: {maxRiskStr}
+                </span>
+              )}
               {result.rag_context_used && (
                 <span className="chip chip-info">
                   <Zap size={10} /> RAG Enhanced
@@ -78,33 +94,55 @@ function ScanResults({ result }: { result: ScanResponse }) {
         </div>
       </div>
 
-      {/* Detected Allergens */}
-      {result.detected_allergens.length > 0 && (
-        <div className="glass rounded-2xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-white/5 flex items-center gap-2">
-            <AlertTriangle size={16} className="text-[var(--gold)]" />
-            <h3 className="font-semibold">
-              Detected Allergens
-              <span className="ml-2 chip chip-warning">{result.detected_allergens.length}</span>
-            </h3>
-          </div>
-          <div className="divide-y divide-white/5">
-            {result.detected_allergens.map((a: AllergenMatch) => (
-              <div key={a.allergen_category} className="px-6 py-4 flex flex-wrap items-start gap-3">
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium capitalize mb-1">
-                    {a.allergen_category.replace(/_/g, " ")}
-                  </p>
-                  <p className="text-xs text-[var(--text-muted)]">
-                    Triggered by: {a.triggered_by.join(", ")}
-                  </p>
-                </div>
-                <SourceBadge source={a.source} />
+      {/* Read More Toggle */}
+      <div className="glass rounded-2xl overflow-hidden">
+        <button
+          onClick={() => setShowReadMore(!showReadMore)}
+          className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+        >
+          <h3 className="font-semibold flex items-center gap-2">
+            Read More
+          </h3>
+          {showReadMore ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+      </div>
+
+      {showReadMore && (
+        <>
+          {/* Detected Allergens */}
+          <div className="glass rounded-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-white/5 flex items-center gap-2">
+              <AlertTriangle size={16} className="text-[var(--gold)]" />
+              <h3 className="font-semibold">
+                Detected Allergens
+                <span className={`ml-2 chip ${result.detected_allergens.length > 0 ? "chip-warning" : "chip-success"}`}>
+                  {result.detected_allergens.length}
+                </span>
+              </h3>
+            </div>
+            {result.detected_allergens.length > 0 ? (
+              <div className="divide-y divide-white/5">
+                {result.detected_allergens.map((a: AllergenMatch) => (
+                  <div key={a.allergen_category} className="px-6 py-4 flex flex-wrap items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium capitalize mb-1">
+                        {a.allergen_category.replace(/_/g, " ")}
+                      </p>
+                      <p className="text-xs text-[var(--text-muted)]">
+                        Triggered by: {a.triggered_by.join(", ")}
+                      </p>
+                    </div>
+                    <SourceBadge source={a.source} />
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <div className="p-6 text-sm text-[var(--text-muted)] flex items-center gap-2">
+                <CheckCircle2 size={16} className="text-emerald-400" />
+                No allergens detected from your profile.
+              </div>
+            )}
           </div>
-        </div>
-      )}
 
       {/* ML Risk Report */}
       <div className="glass rounded-2xl overflow-hidden">
@@ -143,7 +181,7 @@ function ScanResults({ result }: { result: ScanResponse }) {
             {result.ml_risk_report.clinical_alerts.length > 0 ? (
               <div>
                 <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3 flex items-center gap-1.5">
-                  <Brain size={13} className="text-violet-400" /> Clinical Alerts (XGBoost)
+                  <Brain size={13} className="text-violet-400" /> Clinical Alerts
                 </h4>
                 <div className="space-y-2">
                   {result.ml_risk_report.clinical_alerts.map((a: ClinicalAlert) => (
@@ -151,8 +189,12 @@ function ScanResults({ result }: { result: ScanResponse }) {
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-medium text-red-300 capitalize">{a.ingredient}</span>
                         <div className="flex items-center gap-2">
-                          <span className="chip chip-danger text-xs">Risk {a.risk_level}</span>
-                          <span className="chip chip-neutral text-xs">{a.confidence}</span>
+                          <span className="chip chip-danger text-xs font-bold px-2 py-1">Risk {a.risk_level}</span>
+                          {a.confidence !== "N/A" && (
+                            <span className="chip chip-warning text-xs font-bold px-2 py-1">
+                              {a.confidence} Confidence
+                            </span>
+                          )}
                         </div>
                       </div>
                       <p className="text-xs text-[var(--text-muted)]">{a.msg}</p>
@@ -192,6 +234,8 @@ function ScanResults({ result }: { result: ScanResponse }) {
           </div>
         )}
       </div>
+        </>
+      )}
 
       {/* Ingredients */}
       <div className="glass rounded-2xl overflow-hidden">
@@ -237,6 +281,25 @@ export default function ScanPage() {
     if (saved) setUserId(saved);
   }, []);
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (userId.trim()) {
+        try {
+          const u = await getUser(parseInt(userId, 10));
+          setSelectedAllergens(u.allergens);
+        } catch {
+          setSelectedAllergens([]);
+          localStorage.removeItem("allerscan_user_id");
+          setUserId("");
+        }
+      } else {
+        setSelectedAllergens([]);
+      }
+    };
+    const t = setTimeout(fetchUser, 500);
+    return () => clearTimeout(t);
+  }, [userId]);
+
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) {
       setError("Please upload an image file (JPEG, PNG, or WEBP).");
@@ -281,105 +344,118 @@ export default function ScanPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
-      <div className="mb-10">
-        <h1 className="text-4xl font-extrabold mb-2">
-          <span className="gradient-text">Scan</span> Your Dish
-        </h1>
-        <p className="text-[var(--text-secondary)]">
-          Upload a photo of any Sri Lankan dish and get an instant 4-layer allergen analysis.
-        </p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center py-12">
+    <div className="max-w-6xl w-full mx-auto px-6">
+    <div className="grid lg:grid-cols-2 gap-8">
+      
+      {/* ── Left: Upload + Config ─────────────────────────────────── */}
+      <div className="space-y-8">
+        <div className="mb-10">
+          <h1 className="text-4xl font-extrabold mb-2">
+            <span className="gradient-text">Scan</span> Your Dish
+          </h1>
+          <p className="text-[var(--text-secondary)]">
+            Upload a photo of any Sri Lankan dish and get an instant 4-layer allergen analysis.
+          </p>
+        </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
-        {/* ── Left: Upload + Config ─────────────────────────────────── */}
-        <div className="space-y-8">
-
-          {/* Drop zone */}
-          <div
-            className={`drop-zone rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer min-h-[280px] relative transition-all ${isDragging ? "drag-over" : ""}`}
-            onDragEnter={() => setIsDragging(true)}
-            onDragLeave={() => setIsDragging(false)}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={onDrop}
-            onClick={() => fileRef.current?.click()}
-          >
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-            />
-            {imagePreview ? (
-              <div className="relative w-full h-full">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imagePreview}
-                  alt="Dish preview"
-                  className="w-full h-56 object-cover rounded-xl"
-                />
-                <button
-                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center hover:bg-red-500/80 transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setImageFile(null);
-                    setImagePreview(null);
-                    setResult(null);
-                  }}
-                >
-                  <X size={14} className="text-white" />
-                </button>
-                <p className="text-center text-sm text-[var(--text-muted)] mt-3">
-                  {imageFile?.name}
-                </p>
+        {/* Drop zone */}
+        <div
+          className={`drop-zone rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer min-h-[280px] relative transition-all ${isDragging ? "drag-over" : ""}`}
+          onDragEnter={() => setIsDragging(true)}
+          onDragLeave={() => setIsDragging(false)}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={onDrop}
+          onClick={() => fileRef.current?.click()}
+        >
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+          />
+          {imagePreview ? (
+            <div className="relative w-full h-full">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imagePreview}
+                alt="Dish preview"
+                className="w-full h-56 object-cover rounded-xl"
+              />
+              <button
+                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center hover:bg-red-500/80 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setImageFile(null);
+                  setImagePreview(null);
+                  setResult(null);
+                }}
+              >
+                <X size={14} className="text-white" />
+              </button>
+              <p className="text-center text-sm text-[var(--text-muted)] mt-3">
+                {imageFile?.name}
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF6B35]/20 to-[#F59E0B]/10 flex items-center justify-center mb-4">
+                <ImageIcon size={26} className="text-[var(--saffron)]" />
               </div>
-            ) : (
-              <>
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF6B35]/20 to-[#F59E0B]/10 flex items-center justify-center mb-4">
-                  <ImageIcon size={26} className="text-[var(--saffron)]" />
-                </div>
-                <p className="font-semibold text-[var(--text-primary)] mb-1">Drop your dish photo here</p>
-                <p className="text-sm text-[var(--text-muted)]">or click to browse</p>
-                <p className="text-xs text-[var(--text-muted)] mt-3">JPEG · PNG · WEBP · max 10 MB</p>
-              </>
+              <p className="font-semibold text-[var(--text-primary)] mb-1">Drop your dish photo here</p>
+              <p className="text-sm text-[var(--text-muted)]">or click to browse</p>
+              <p className="text-xs text-[var(--text-muted)] mt-3">JPEG · PNG · WEBP · max 10 MB</p>
+            </>
+          )}
+        </div>
+
+        {/* User ID field */}
+        <div className="glass rounded-2xl p-5">
+          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+            User ID <span className="text-[var(--text-muted)]">(optional — loads saved profile)</span>
+          </label>
+          <input
+            type="number"
+            placeholder="e.g. 1"
+            value={userId}
+            onChange={(e) => {
+              setUserId(e.target.value);
+              if (e.target.value) localStorage.setItem("allerscan_user_id", e.target.value);
+            }}
+            className="input-field w-full px-4 py-2.5 rounded-xl text-sm"
+          />
+        </div>
+
+        {/* Allergen picker */}
+        <div className="glass rounded-2xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-sm font-medium text-[var(--text-secondary)]">
+              My Allergens
+            </label>
+            {!userId && selectedAllergens.length > 0 && (
+              <button
+                className="text-xs text-[var(--text-muted)] hover:text-[var(--saffron)] transition-colors"
+                onClick={() => setSelectedAllergens([])}
+              >
+                Clear all
+              </button>
+            )}
+            {userId && (
+              <span className="text-xs text-emerald-400 font-medium flex items-center gap-1"><CheckCircle2 size={12} /> Loaded from profile</span>
             )}
           </div>
-
-          {/* User ID field */}
-          <div className="glass rounded-2xl p-5">
-            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-              User ID <span className="text-[var(--text-muted)]">(optional — loads saved profile)</span>
-            </label>
-            <input
-              type="number"
-              placeholder="e.g. 1"
-              value={userId}
-              onChange={(e) => {
-                setUserId(e.target.value);
-                if (e.target.value) localStorage.setItem("allerscan_user_id", e.target.value);
-              }}
-              className="input-field w-full px-4 py-2.5 rounded-xl text-sm"
-            />
-          </div>
-
-          {/* Allergen picker */}
-          <div className="glass rounded-2xl p-5">
-            <div className="flex items-center justify-between mb-3">
-              <label className="text-sm font-medium text-[var(--text-secondary)]">
-                My Allergens
-              </label>
-              {selectedAllergens.length > 0 && (
-                <button
-                  className="text-xs text-[var(--text-muted)] hover:text-[var(--saffron)] transition-colors"
-                  onClick={() => setSelectedAllergens([])}
-                >
-                  Clear all
-                </button>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {allergenOptions.map((a) => (
+          <div className="flex flex-wrap gap-2">
+            {userId ? (
+              selectedAllergens.length > 0 ? (
+                selectedAllergens.map((a) => (
+                  <span key={a} className="chip chip-danger capitalize">{a.replace(/_/g, " ")}</span>
+                ))
+              ) : (
+                <span className="text-sm text-[var(--text-muted)]">No allergens found in profile.</span>
+              )
+            ) : (
+              allergenOptions.map((a) => (
                 <button
                   key={a}
                   onClick={() => toggleAllergen(a)}
@@ -389,54 +465,57 @@ export default function ScanPage() {
                 >
                   {a.replace(/_/g, " ")}
                 </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Scan button */}
-          <button
-            onClick={handleScan}
-            disabled={!imageFile || scanning}
-            className="btn-primary w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 text-base"
-          >
-            {scanning ? (
-              <>
-                <Loader2 size={18} className="spin" />
-                Analysing dish…
-              </>
-            ) : (
-              <>
-                <ScanLine size={18} />
-                Scan for Allergens
-              </>
+              ))
             )}
-          </button>
-
-          {error && (
-            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300 flex items-start gap-2">
-              <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-              {error}
-            </div>
-          )}
+          </div>
         </div>
 
-        {/* ── Right: Results ────────────────────────────────────────── */}
-        <div>
-          {result ? (
-            <ScanResults result={result} />
+        {/* Scan button */}
+        <button
+          onClick={handleScan}
+          disabled={!imageFile || scanning}
+          className="btn-primary w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 text-base"
+        >
+          {scanning ? (
+            <>
+              <Loader2 size={18} className="spin" />
+              Analysing dish…
+            </>
           ) : (
-            <div className="glass rounded-2xl h-full min-h-[400px] flex flex-col items-center justify-center text-center p-10 border-2 border-dashed border-white/5">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FF6B35]/10 to-[#F59E0B]/5 flex items-center justify-center mb-4">
-                <ScanLine size={28} className="text-[var(--text-muted)]" />
-              </div>
-              <p className="font-medium text-[var(--text-secondary)] mb-1">Results appear here</p>
-              <p className="text-sm text-[var(--text-muted)]">
-                Upload a dish photo and tap Scan to begin analysis.
-              </p>
-            </div>
+            <>
+              <ScanLine size={18} />
+              Scan for Allergens
+            </>
           )}
-        </div>
+        </button>
+
+        {error && (
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300 flex items-start gap-2">
+            <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+            {error}
+          </div>
+        )}
       </div>
+
+      {/* ── Right: Results ────────────────────────────────────────── */}
+      <div>
+        {result ? (
+          <ScanResults result={result} userAllergens={selectedAllergens} />
+        ) : (
+          <div className="glass rounded-2xl h-full min-h-[400px] flex flex-col items-center justify-center text-center p-10 border-2 border-dashed border-white/5">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FF6B35]/10 to-[#F59E0B]/5 flex items-center justify-center mb-4">
+              <ScanLine size={28} className="text-[var(--text-muted)]" />
+            </div>
+            <p className="font-medium text-[var(--text-secondary)] mb-1">Results appear here</p>
+            <p className="text-sm text-[var(--text-muted)]">
+              Upload a dish photo and tap Scan to begin analysis.
+            </p>
+          </div>
+        )}
+      </div>
+      
     </div>
+  </div>
+</div>
   );
 }

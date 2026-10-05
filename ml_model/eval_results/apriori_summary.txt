@@ -1,0 +1,71 @@
+--- VALIDATED CROSS-REACTIVITY RULES ---
+RULE: [ MUTTON ] -> [ BEEF ]
+  Confidence : 94.4%
+  Lift       : 3.15 (Strength)
+  Support    : 18.9% of total population
+----------------------------------------
+RULE: [ MUTTON ] -> [ PORK ]
+  Confidence : 94.4%
+  Lift       : 2.74 (Strength)
+  Support    : 18.9% of total population
+----------------------------------------
+RULE: [ BEEF ] -> [ PORK ]
+  Confidence : 85.2%
+  Lift       : 2.47 (Strength)
+  Support    : 25.6% of total population
+----------------------------------------
+RULE: [ CUTTLEFISH / SQUID ] -> [ CRAB ]
+  Confidence : 83.3%
+  Lift       : 4.17 (Strength)
+  Support    : 16.7% of total population
+----------------------------------------
+RULE: [ CRAB ] -> [ CUTTLEFISH / SQUID ]
+  Confidence : 83.3%
+  Lift       : 4.17 (Strength)
+  Support    : 16.7% of total population
+----------------------------------------
+RULE: [ PRAWNS ] -> [ CUTTLEFISH / SQUID ]
+  Confidence : 76.5%
+  Lift       : 3.82 (Strength)
+  Support    : 14.4% of total population
+----------------------------------------
+RULE: [ PORK ] -> [ BEEF ]
+  Confidence : 74.2%
+  Lift       : 2.47 (Strength)
+  Support    : 25.6% of total population
+----------------------------------------
+RULE: [ CUTTLEFISH / SQUID ] -> [ PRAWNS ]
+  Confidence : 72.2%
+  Lift       : 3.82 (Strength)
+  Support    : 14.4% of total population
+----------------------------------------
+RULE: [ PRAWNS ] -> [ CRAB ]
+  Confidence : 70.6%
+  Lift       : 3.53 (Strength)
+  Support    : 13.3% of total population
+----------------------------------------
+RULE: [ PINEAPPLE ] -> [ PRAWNS ]
+  Confidence : 69.2%
+  Lift       : 3.67 (Strength)
+  Support    : 10.0% of total population
+----------------------------------------
+RULE: [ CRAB ] -> [ PRAWNS ]
+  Confidence : 66.7%
+  Lift       : 3.53 (Strength)
+  Support    : 13.3% of total population
+----------------------------------------
+RULE: [ BEEF ] -> [ MUTTON ]
+  Confidence : 63.0%
+  Lift       : 3.15 (Strength)
+  Support    : 18.9% of total population
+----------------------------------------
+RULE: [ PORK ] -> [ MUTTON ]
+  Confidence : 54.8%
+  Lift       : 2.74 (Strength)
+  Support    : 18.9% of total population
+----------------------------------------
+RULE: [ PRAWNS ] -> [ PINEAPPLE ]
+  Confidence : 52.9%
+  Lift       : 3.67 (Strength)
+  Support    : 10.0% of total population
+----------------------------------------

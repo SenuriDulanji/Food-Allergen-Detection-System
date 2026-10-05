@@ -1,87 +1,54 @@
 # ========================================
-# Python
+# Python & Backend
 # ========================================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
 *.egg-info/
-.installed.cfg
 *.egg
-MANIFEST
 
-# Virtual Environments
+# Virtual Environments (Strictly anchored so it doesn't break frontend)
+/venv/
+/.venv/
 venv/
-env/
-ENV/
 .venv/
-.venv*/
 
 # ========================================
-# IDE & Editors
+# IDE & OS
 # ========================================
 .vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
 Thumbs.db
+.DS_Store
 
 # ========================================
-# Environment Variables
+# Environment Variables & Logs
 # ========================================
 .env
-.env.local
-.env.*.local
-
-# ========================================
-# Logs & Temporary Files
-# ========================================
+.env.*
 *.log
 logs/
-*.log.*
 
 # ========================================
 # Jupyter Notebooks
 # ========================================
 .ipynb_checkpoints/
 *.ipynb_checkpoints
-**/.ipynb_checkpoints/*
-*.nbconvert.ipynb
 
 # ========================================
-# Dataset & Large Files
+# Dataset & AI Models
 # ========================================
 dataset/images/**/*.jpg
 dataset/images/**/*.jpeg
 dataset/images/**/*.png
 !dataset/images/*/.gitkeep
 
-# Large model files or caches
-*.h5
-*.hdf5
-*.onnx
+# PyTorch and general large files
 *.pt
 *.pth
-chroma_db/
-vector_store/
 *.bin
-*.safetensors
 
 # ========================================
 # Frontend (Next.js)
@@ -90,26 +57,23 @@ frontend/node_modules/
 frontend/.next/
 frontend/out/
 frontend/build/
-frontend/.vercel/
-frontend/coverage/
 frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
-frontend/pnpm-debug.log*
 
 # ========================================
-# OS Generated
+# EXPLICIT ALLOWANCES (Bulletproof Section)
 # ========================================
-.DS_Store
-.AppleDouble
-.LSOverride
-Icon
-._*
-.Spotlight-V100
-.Trashes
+# Force Git to NEVER ignore these critical frontend files/folders, 
+# even if a bad rule is added later.
+!frontend/lib/
+!frontend/src/
+!frontend/components/
+!frontend/tsconfig.json
+!frontend/jsconfig.json
+!frontend/package.json
+!frontend/package-lock.json
 
 # ========================================
-# Others
+# Databases & Temp Files
 # ========================================
 *.sqlite3
 *.db
@@ -118,11 +82,3 @@ Icon
 cache/
 temp/
 tmp/
-
-# ========================================
-# Optional: Keep empty folders
-# ========================================
-!dataset/images/.gitkeep
-!dataset/recipes/raw/.gitkeep
-!dataset/recipes/processed/.gitkeep
-!experiments/.gitkeep

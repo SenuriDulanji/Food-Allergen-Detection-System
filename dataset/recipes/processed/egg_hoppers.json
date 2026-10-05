@@ -1,0 +1,34 @@
+{
+  "dish_name": "egg_hoppers",
+  "aliases": [
+    "biththara_appa",
+    "egg_hopper"
+  ],
+  "ingredients": [
+    {
+      "name": "rice flour"
+    },
+    {
+      "name": "palm toddy or dried yeast"
+    },
+    {
+      "name": "sugar"
+    },
+    {
+      "name": "thin coconut milk"
+    },
+    {
+      "name": "thick coconut milk"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "eggs"
+    },
+    {
+      "name": "black pepper (optional)"
+    }
+  ],
+  "description": "A traditional Sri Lankan hopper (bowl-shaped rice flour pancake) with a whole egg cracked into the soft center during cooking, often finished with a sprinkle of salt and black pepper."
+}

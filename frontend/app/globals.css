@@ -176,6 +176,11 @@ body {
 
 .input-field::placeholder { color: var(--text-muted); }
 
+option {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
 /* ─── Scan drop-zone ────────────────────────────────────────────── */
 .drop-zone {
   border: 2px dashed rgba(255,107,53,0.25);

@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     #  Gemini                                                              #
     # ------------------------------------------------------------------ #
     GEMINI_API_KEY: str
-    LLM_MODEL: str = "gemini-2.5-flash"
+    LLM_MODEL: str = "gemini-3.1-flash-lite"
     EMBEDDING_MODEL: str = "models/gemini-embedding-001"
 
     # ------------------------------------------------------------------ #

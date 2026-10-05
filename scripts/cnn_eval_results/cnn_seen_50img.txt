@@ -1,0 +1,63 @@
+
+=================================================================
+  CNN BASELINE OOD EVALUATION SUMMARY
+=================================================================
+  Total Images Tested  : 50
+
+  Top-1 Accuracy       : 34.00%  (17/50)
+  Top-3 Accuracy       : 60.00%  (30/50)
+  Average Inference Time: 0.3079 seconds
+
+-----------------------------------------------------------------
+  Per-Class Accuracy (Includes Unseen Classes)
+-----------------------------------------------------------------
+  cashew_curry               Top-1: 100.0%  Top-3: 100.0%  (n=5)
+  chicken_curry              Top-1:   0.0%  Top-3:  40.0%  (n=5)
+  crab_curry                 Top-1:  60.0%  Top-3: 100.0%  (n=5)
+  dhal_curry                 Top-1:  60.0%  Top-3:  80.0%  (n=5)
+  egg_curry                  Top-1:   0.0%  Top-3:   0.0%  (n=5)
+  fish_curry                 Top-1:  20.0%  Top-3:  40.0%  (n=5)
+  mutton_curry               Top-1:   0.0%  Top-3:  60.0%  (n=5)
+  pol_sambal                 Top-1:  80.0%  Top-3: 100.0%  (n=5)
+  potato_curry               Top-1:  20.0%  Top-3:  20.0%  (n=5)
+  prawn_curry                Top-1:   0.0%  Top-3:  60.0%  (n=5)
+
+-----------------------------------------------------------------
+  Classification Report
+-----------------------------------------------------------------
+               precision    recall  f1-score   support
+
+ cashew_curry       0.50      1.00      0.67         5
+chicken_curry       0.00      0.00      0.00         5
+   crab_curry       0.75      0.60      0.67         5
+   dhal_curry       1.00      0.60      0.75         5
+    egg_curry       0.00      0.00      0.00         5
+   fish_curry       1.00      0.20      0.33         5
+ mutton_curry       0.00      0.00      0.00         5
+   pol_sambal       1.00      0.80      0.89         5
+ potato_curry       0.25      0.20      0.22         5
+  prawn_curry       0.00      0.00      0.00         5
+
+    micro avg       0.61      0.34      0.44        50
+    macro avg       0.45      0.34      0.35        50
+ weighted avg       0.45      0.34      0.35        50
+
+
+-----------------------------------------------------------------
+  Confusion Matrix  (columns = 10 Model Outputs + Unk)
+-----------------------------------------------------------------
+  GT \ Pred      bandakka_curry   batu_moju        beef_curry       beetroot_curry   carrot_curry     cashew_curry     chicken_curry    crab_curry       dell_curry       dhal_curry       dry_fish_curry   egg_curry        egg_hoppers      fish_ambulthiyal  fish_curry       fish_cutlets     gotukola_sambal  green_beans_curry  hot_butter_cuttlefish  isso_vade        karawila_curry   kos_curry        milk_rice        mutton_curry     pittu            plain_hoppers    pol_roti         pol_sambal       polos_curry      pork_curry       potato_curry     prawn_curry      soya_meat_curry  squid_curry      string_hoppers   unknown        
+  cashew_curry   0                0                0                0                0                5                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0              
+  chicken_curry  0                0                3                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                2                0                0                0                0                0                0              
+  crab_curry     0                0                1                0                0                0                0                3                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                1                0                0                0                0                0                0              
+  dhal_curry     0                0                0                0                0                0                0                0                0                3                0                0                0                0                0                0                0                0                0                0                0                1                0                0                0                0                0                0                0                0                1                0                0                0                0                0              
+  egg_curry      0                0                0                0                0                1                0                0                2                0                0                0                0                0                0                0                0                0                0                1                0                0                0                0                0                0                0                0                0                0                1                0                0                0                0                0              
+  fish_curry     0                0                1                0                0                0                0                0                0                0                0                0                0                0                1                0                0                0                0                0                0                0                0                0                0                0                0                0                0                1                1                1                0                0                0                0              
+  mutton_curry   0                0                0                0                0                1                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                4                0                0                0                0                0                0              
+  pol_sambal     0                0                0                0                0                0                0                0                0                0                0                0                0                1                0                0                0                0                0                0                0                0                0                0                0                0                0                4                0                0                0                0                0                0                0                0              
+  potato_curry   0                0                0                0                3                1                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                1                0                0                0                0                0              
+  prawn_curry    0                0                1                0                0                2                1                1                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0                0              
+
+  Results CSV : /content/drive/MyDrive/data/cnn_eval_results/cnn_ood_results_20260708_031956.csv
+  Summary TXT : /content/drive/MyDrive/data/cnn_eval_results/cnn_ood_summary_20260708_031956.txt
+=================================================================

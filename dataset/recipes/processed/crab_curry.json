@@ -1,21 +1,54 @@
 {
-    "dish_name": "crab_curry",
-    "ingredients": [
-      {"name": "fresh crabs"},
-      {"name": "onion"},
-      {"name": "green finger-length chillies"},
-      {"name": "Roasted Curry Powder or fish curry powder"},
-      {"name": "turmeric powder"},
-      {"name": "chilli powder"},
-      {"name": "fenugreek powder"},
-      {"name": "dried tamarind pulp"},
-      {"name": "curry leaves"},
-      {"name": "water"},
-      {"name": "thick coconut milk"},
-      {"name": "mustard powder"},
-      {"name": "lime juice"},
-      {"name": "salt"},
-      {"name": "pepper"}
-    ],
-    "description": "Fresh crabs simmered to perfection in a spiced coconut curry gravy"
-  }
+  "dish_name": "crab_curry",
+  "aliases": [
+    "kakulu_mas"
+  ],
+  "ingredients": [
+    {
+      "name": "fresh crabs"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "green finger-length chillies"
+    },
+    {
+      "name": "Roasted Curry Powder or fish curry powder"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "chilli powder"
+    },
+    {
+      "name": "fenugreek powder"
+    },
+    {
+      "name": "dried tamarind pulp"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "water"
+    },
+    {
+      "name": "thick coconut milk"
+    },
+    {
+      "name": "mustard powder"
+    },
+    {
+      "name": "lime juice"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "pepper"
+    }
+  ],
+  "description": "Fresh crabs simmered to perfection in a spiced coconut curry gravy"
+}

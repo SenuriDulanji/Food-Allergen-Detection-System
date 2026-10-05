@@ -1,0 +1,48 @@
+{
+  "dish_name": "karawila_curry",
+  "aliases": [
+    "bitter_gourd_curry"
+  ],
+  "ingredients": [
+    {
+      "name": "karawila (bitter gourd)"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "oil (for frying)"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "green chili"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "mustard seeds"
+    },
+    {
+      "name": "roasted curry powder"
+    },
+    {
+      "name": "chili powder"
+    },
+    {
+      "name": "coconut milk"
+    },
+    {
+      "name": "tamarind juice"
+    }
+  ],
+  "description": "Fried bitter gourd slices cooked in a tangy tamarind and coconut milk gravy to balance the natural bitterness."
+}

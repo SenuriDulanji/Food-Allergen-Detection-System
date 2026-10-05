@@ -1,0 +1,40 @@
+{
+  "dish_name": "beef_curry",
+  "aliases": [],
+  "ingredients": [
+    {
+      "name": "beef sirloin"
+    },
+    {
+      "name": "white vinegar"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "pepper"
+    },
+    {
+      "name": "ghee or oil"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "lemongrass"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "green finger-length chillies"
+    },
+    {
+      "name": "chilli powder"
+    },
+    {
+      "name": "coconut milk"
+    }
+  ],
+  "description": "A rich dish of Dutch origin where beef is seared and then slowly simmered in a spicy coconut milk gravy."
+}

@@ -1,0 +1,45 @@
+{
+  "dish_name": "dell_curry",
+  "aliases": [
+    "breadfruit_curry"
+  ],
+  "ingredients": [
+    {
+      "name": "breadfruit (dell)"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "green chili"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "pandan leaf"
+    },
+    {
+      "name": "mustard seeds"
+    },
+    {
+      "name": "cinnamon stick"
+    },
+    {
+      "name": "roasted curry powder"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "coconut milk"
+    },
+    {
+      "name": "salt"
+    }
+  ],
+  "description": "A starchy, comforting curry where cubed breadfruit is simmered until tender in a fragrant and spiced coconut milk base."
+}

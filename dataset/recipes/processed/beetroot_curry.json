@@ -1,0 +1,43 @@
+{
+  "dish_name": "beetroot_curry",
+  "aliases": [],
+  "ingredients": [
+    {
+      "name": "beetroot"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "green chili"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "pandan leaf"
+    },
+    {
+      "name": "cinnamon"
+    },
+    {
+      "name": "unroasted curry powder"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "mustard seeds"
+    },
+    {
+      "name": "coconut milk"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "oil"
+    }
+  ],
+  "description": "A vibrant and slightly sweet curry where matchstick-cut beetroots are cooked in a gently spiced coconut milk gravy."
+}

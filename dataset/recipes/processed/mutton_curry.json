@@ -1,22 +1,57 @@
 {
-    "dish_name": "mutton_curry",
-    "ingredients": [
-      {"name": "oil"},
-      {"name": "onion"},
-      {"name": "garlic"},
-      {"name": "fresh ginger"},
-      {"name": "green finger-length chillies"},
-      {"name": "lemongrass"},
-      {"name": "cinnamon"},
-      {"name": "cardamoms"},
-      {"name": "lamb"},
-      {"name": "curry powder"},
-      {"name": "chilli powder"},
-      {"name": "turmeric powder"},
-      {"name": "pepper"},
-      {"name": "tomatoes"},
-      {"name": "thick coconut milk"},
-      {"name": "salt"}
-    ],
-    "description": "Lamb stirred with aromatic spices and tomatoes, simmered until tender in thick coconut milk"
-  }
+  "dish_name": "mutton_curry",
+  "aliases": [
+    "elu_mas"
+  ],
+  "ingredients": [
+    {
+      "name": "oil"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "fresh ginger"
+    },
+    {
+      "name": "green finger-length chillies"
+    },
+    {
+      "name": "lemongrass"
+    },
+    {
+      "name": "cinnamon"
+    },
+    {
+      "name": "cardamoms"
+    },
+    {
+      "name": "lamb"
+    },
+    {
+      "name": "curry powder"
+    },
+    {
+      "name": "chilli powder"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "pepper"
+    },
+    {
+      "name": "tomatoes"
+    },
+    {
+      "name": "thick coconut milk"
+    },
+    {
+      "name": "salt"
+    }
+  ],
+  "description": "Lamb stirred with aromatic spices and tomatoes, simmered until tender in thick coconut milk"
+}

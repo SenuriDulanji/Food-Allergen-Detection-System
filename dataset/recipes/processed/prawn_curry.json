@@ -1,21 +1,52 @@
 {
-    "dish_name": "prawn_curry",
-    "ingredients": [
-      {"name": "diced onion"},
-      {"name": "green finger-length chillies"},
-      {"name": "turmeric powder"},
-      {"name": "Unroasted Curry Powder or fish curry powder"},
-      {"name": "chilli powder"},
-      {"name": "pandanus leaf"},
-      {"name": "curry leaves"},
-      {"name": "cinnamon"},
-      {"name": "fresh jumbo prawns"},
-      {"name": "thin coconut milk"},
-      {"name": "mustard powder"},
-      {"name": "thick coconut milk"},
-      {"name": "chopped cabbage leaves"},
-      {"name": "lime juice"},
-      {"name": "salt"}
-    ],
-    "description": "Jumbo prawns cooked in a spiced coconut milk broth with cabbage leaves and lime juice"
-  }
+  "dish_name": "prawn_curry",
+  "aliases": [],
+  "ingredients": [
+    {
+      "name": "diced onion"
+    },
+    {
+      "name": "green finger-length chillies"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "Unroasted Curry Powder or fish curry powder"
+    },
+    {
+      "name": "chilli powder"
+    },
+    {
+      "name": "pandanus leaf"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "cinnamon"
+    },
+    {
+      "name": "fresh jumbo prawns"
+    },
+    {
+      "name": "thin coconut milk"
+    },
+    {
+      "name": "mustard powder"
+    },
+    {
+      "name": "thick coconut milk"
+    },
+    {
+      "name": "chopped cabbage leaves"
+    },
+    {
+      "name": "lime juice"
+    },
+    {
+      "name": "salt"
+    }
+  ],
+  "description": "Jumbo prawns cooked in a spiced coconut milk broth with cabbage leaves and lime juice"
+}

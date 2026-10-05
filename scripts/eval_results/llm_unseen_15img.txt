@@ -1,0 +1,45 @@
+
+=================================================================
+  EVALUATION SUMMARY (BASELINE LLM ONLY)
+=================================================================
+  Total Images Tested  : 15
+  Successfully Eval'd  : 15
+  Errors / Skipped     : 0
+
+  Top-1 Accuracy       : 13.33%  (2/15)
+  Top-3 Accuracy       : 13.33%  (2/15)
+  Average Inference Time: 7.26 seconds
+  Total Inference Time : 108.97 seconds
+
+-----------------------------------------------------------------
+  Per-Class Accuracy
+-----------------------------------------------------------------
+  koththu                    Top-1:   0.0%  Top-3:   0.0%  (n=5)
+  pumpkin_curry              Top-1:   0.0%  Top-3:   0.0%  (n=5)
+  seeni_sambol               Top-1:  40.0%  Top-3:  40.0%  (n=5)
+
+-----------------------------------------------------------------
+  Classification Report (Precision, Recall, F1-Score)
+-----------------------------------------------------------------
+               precision    recall  f1-score   support
+
+      koththu       0.00      0.00      0.00         5
+pumpkin_curry       0.00      0.00      0.00         5
+ seeni_sambol       1.00      0.40      0.57         5
+
+    micro avg       1.00      0.13      0.24        15
+    macro avg       0.33      0.13      0.19        15
+ weighted avg       0.33      0.13      0.19        15
+
+
+-----------------------------------------------------------------
+  Confusion Matrix  (rows=Ground Truth, cols=Predicted)
+-----------------------------------------------------------------
+  GT \ Pred      koththu          pumpkin_curry    seeni_sambol   
+  koththu        0                0                0              
+  pumpkin_curry  0                0                0              
+  seeni_sambol   0                0                2              
+
+  Results CSV : C:\Users\User\Desktop\Food-Allergen-Detection-System\scripts\eval_results\results_20260718_013629.csv
+  Summary TXT : C:\Users\User\Desktop\Food-Allergen-Detection-System\scripts\eval_results\summary_20260718_013629.txt
+=================================================================

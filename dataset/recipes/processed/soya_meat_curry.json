@@ -1,0 +1,48 @@
+{
+  "dish_name": "soya_meat_curry",
+  "aliases": [
+    "soya_curry"
+  ],
+  "ingredients": [
+    {
+      "name": "soya chunks (textured vegetable protein)"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "ginger"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "pandan leaf"
+    },
+    {
+      "name": "roasted curry powder"
+    },
+    {
+      "name": "chili powder"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "mustard seeds"
+    },
+    {
+      "name": "coconut milk"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "oil"
+    }
+  ],
+  "description": "A flavorful vegetarian curry where rehydrated soya chunks absorb a rich, spicy coconut milk base."
+}

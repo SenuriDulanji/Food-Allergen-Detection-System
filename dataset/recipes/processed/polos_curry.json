@@ -1,0 +1,60 @@
+{
+  "dish_name": "polos_curry",
+  "aliases": [
+    "baby_jackfruit_curry"
+  ],
+  "ingredients": [
+    {
+      "name": "baby jackfruit (polos)"
+    },
+    {
+      "name": "red onion"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "ginger"
+    },
+    {
+      "name": "green chili"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "pandan leaf"
+    },
+    {
+      "name": "goraka (garcinia cambogia paste or dried)"
+    },
+    {
+      "name": "roasted Sri Lankan curry powder"
+    },
+    {
+      "name": "chili powder"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "black pepper"
+    },
+    {
+      "name": "mustard seeds"
+    },
+    {
+      "name": "thin coconut milk"
+    },
+    {
+      "name": "thick coconut milk"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "cooking oil"
+    }
+  ],
+  "description": "A rich, dark, and meaty Sri Lankan curry where tender pieces of young baby jackfruit are slow-cooked for hours in toasted spices, coconut milk, and tangy goraka until they melt in the mouth."
+}

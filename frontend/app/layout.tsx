@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <span>
               <span className="gradient-text font-semibold">AllerScan</span> — AI-Based Food Allergen Detection for Sri Lankan Dishes
             </span>
-            <span>Powered by Gemini Vision · XGBoost · Apriori Rules</span>
+            <span>Powered by Gemini Vision ·  logistic regression · Apriori Rules</span>
           </div>
         </footer>
       </body>

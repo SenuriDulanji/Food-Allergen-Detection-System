@@ -1,0 +1,16 @@
+index,image,ground_truth,top1_pred,top3_preds,top1_correct,top3_correct,inference_time_s
+1,Unseen Data/koththu/10008.jpeg,koththu,milk_rice,milk_rice|isso_vade|fish_curry,False,False,0.4471
+2,Unseen Data/koththu/10013.jpeg,koththu,isso_vade,isso_vade|crab_curry|chicken_curry,False,False,0.2235
+3,Unseen Data/koththu/10015.jpg,koththu,crab_curry,crab_curry|beef_curry|mutton_curry,False,False,0.1970
+4,Unseen Data/koththu/10016.jpg,koththu,batu_moju,batu_moju|crab_curry|squid_curry,False,False,0.1973
+5,Unseen Data/koththu/10018.jpg,koththu,crab_curry,crab_curry|isso_vade|batu_moju,False,False,0.1986
+6,Unseen Data/pumpkin_curry/10001.jpeg,pumpkin_curry,potato_curry,potato_curry|cashew_curry|kos_curry,False,False,0.2053
+7,Unseen Data/pumpkin_curry/10003.jpg,pumpkin_curry,potato_curry,potato_curry|kos_curry|dhal_curry,False,False,0.2014
+8,Unseen Data/pumpkin_curry/10004.jpg,pumpkin_curry,potato_curry,potato_curry|dell_curry|kos_curry,False,False,0.2295
+9,Unseen Data/pumpkin_curry/10014.jpg,pumpkin_curry,potato_curry,potato_curry|dell_curry|kos_curry,False,False,0.2040
+10,Unseen Data/pumpkin_curry/10020.jpg,pumpkin_curry,potato_curry,potato_curry|kos_curry|dell_curry,False,False,0.2228
+11,Unseen Data/seeni_sambol/10001.jpg,seeni_sambol,pork_curry,pork_curry|mutton_curry|cashew_curry,False,False,0.1994
+12,Unseen Data/seeni_sambol/10002.jpg,seeni_sambol,beef_curry,beef_curry|pork_curry|mutton_curry,False,False,0.2051
+13,Unseen Data/seeni_sambol/10003.jpg,seeni_sambol,pork_curry,pork_curry|mutton_curry|chicken_curry,False,False,0.2019
+14,Unseen Data/seeni_sambol/10004.jpg,seeni_sambol,batu_moju,batu_moju|crab_curry|squid_curry,False,False,0.1912
+15,Unseen Data/seeni_sambol/10005.jpg,seeni_sambol,pork_curry,pork_curry|beef_curry|mutton_curry,False,False,0.2353

@@ -1,0 +1,16 @@
+index,image,ground_truth,top1_pred,top3_preds,top1_correct,top3_correct,inference_time_s
+1,dataset\test-images\Unseen Data\koththu\10008.jpeg,koththu,kottu_roti,kottu_roti,False,False,6.9697
+2,dataset\test-images\Unseen Data\koththu\10013.jpeg,koththu,kottu_roti,kottu_roti,False,False,11.2286
+3,dataset\test-images\Unseen Data\koththu\10015.jpg,koththu,kottu_roti,kottu_roti,False,False,3.0574
+4,dataset\test-images\Unseen Data\koththu\10016.jpg,koththu,kottu_roti,kottu_roti,False,False,1.5745
+5,dataset\test-images\Unseen Data\koththu\10018.jpg,koththu,kottu_roti,kottu_roti,False,False,6.3787
+6,dataset\test-images\Unseen Data\pumpkin_curry\10001.jpeg,pumpkin_curry,wambatu_moju,wambatu_moju,False,False,9.6394
+7,dataset\test-images\Unseen Data\pumpkin_curry\10003.jpg,pumpkin_curry,wambatu_moju,wambatu_moju,False,False,7.4694
+8,dataset\test-images\Unseen Data\pumpkin_curry\10004.jpg,pumpkin_curry,wambatu_moju,wambatu_moju,False,False,11.5987
+9,dataset\test-images\Unseen Data\pumpkin_curry\10014.jpg,pumpkin_curry,wambatu_moju,wambatu_moju,False,False,6.8247
+10,dataset\test-images\Unseen Data\pumpkin_curry\10020.jpg,pumpkin_curry,wambatu_moju,wambatu_moju,False,False,9.5250
+11,dataset\test-images\Unseen Data\seeni_sambol\10001.jpg,seeni_sambol,lunu_miris,lunu_miris,False,False,9.5445
+12,dataset\test-images\Unseen Data\seeni_sambol\10002.jpg,seeni_sambol,seeni_sambol,seeni_sambol,True,True,8.6382
+13,dataset\test-images\Unseen Data\seeni_sambol\10003.jpg,seeni_sambol,lunu_miris,lunu_miris,False,False,8.3602
+14,dataset\test-images\Unseen Data\seeni_sambol\10004.jpg,seeni_sambol,seeni_sambol,seeni_sambol,True,True,5.7703
+15,dataset\test-images\Unseen Data\seeni_sambol\10005.jpg,seeni_sambol,seeni_sambal,seeni_sambal,False,False,2.3896

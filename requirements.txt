@@ -44,3 +44,6 @@ transformers
 torch
 torchvision
 torchaudio
+xgboost
+imbalanced-learn
+joblib

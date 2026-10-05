@@ -1,0 +1,57 @@
+{
+  "dish_name": "squid_curry",
+  "aliases": [
+    "dallo_curry"
+  ],
+  "ingredients": [
+    {
+      "name": "fresh small squid"
+    },
+    {
+      "name": "oil"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "cinnamon stick"
+    },
+    {
+      "name": "green finger-length chillies"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "fresh ginger"
+    },
+    {
+      "name": "Unroasted Curry Powder or fish curry powder"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "chilli powder"
+    },
+    {
+      "name": "tomato"
+    },
+    {
+      "name": "thin coconut milk"
+    },
+    {
+      "name": "thick coconut milk"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "pepper"
+    }
+  ],
+  "description": "Fresh squid cooked in a spicy, aromatic coconut milk broth until tender."
+}

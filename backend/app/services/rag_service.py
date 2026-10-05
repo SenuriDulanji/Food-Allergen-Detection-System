@@ -33,9 +33,14 @@ class TransformersCLIPEmbeddingFunction(EmbeddingFunction[Images]):
         try:
             from transformers import CLIPProcessor, CLIPModel
             self.processor = CLIPProcessor.from_pretrained(model_name)
-            self.model = CLIPModel.from_pretrained(model_name)
-            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            self.model = CLIPModel.from_pretrained(model_name, use_safetensors=True)
+            
+            if not torch.cuda.is_available():
+                raise RuntimeError("CUDA is not available. GPU is required for this model prediction as requested.")
+                
+            self.device = "cuda"
             self.model.to(self.device)
+            logger.info("CLIP model successfully loaded onto GPU (cuda).")
         except ImportError:
             logger.error("transformers package is required for TransformersCLIPEmbeddingFunction")
             raise
@@ -220,11 +225,21 @@ class RAGService:
             3. Image Database Matches (based on visual similarity via CLIP):
             {json.dumps(image_context, indent=2)}
             
+            CRITICAL INSTRUCTION FOR UNKNOWN DISHES:
+            Our database only contains 35 specific curries. 
+            If the dish in the image is NOT one of those 35 curries (like Koththu), 
+            the "Image Database Matches" will be completely wrong because it is just returning the closest looking curry it has. 
+            Therefore: If the visual matches contradict the initial Vision Guess, 
+            heavily prioritize the Vision Guess! Do not output Pol Sambal or Potato Curry if the vision guess is Koththu.
+            
+            CRITICAL INSTRUCTION FOR ALIASES:
+            If your vision guess is a local alias (e.g. "ala_hodi") and the database matches provide the canonical English name 
+            (e.g. "potato_curry"), you MUST output the canonical English "dish_name" exactly as it appears in the database matches.
+            
             Based on this hybrid context, identify the dish and list its ingredients.
-            If the dish cannot be identified confidently, output "unknown" for the dish name.
             
             Respond strictly with a JSON object containing:
-            - "dish_name": string (snake_case, e.g. "fish_curry")
+            - "dish_name": string (snake_case, e.g. "fish_curry", "potato_curry", or "koththu")
             - "ingredients": list of strings
             """
             

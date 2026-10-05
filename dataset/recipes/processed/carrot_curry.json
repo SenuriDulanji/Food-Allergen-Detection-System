@@ -1,0 +1,52 @@
+{
+  "dish_name": "carrot_curry",
+  "aliases": [],
+  "ingredients": [
+    {
+      "name": "carrots"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "green chili"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "pandan leaf"
+    },
+    {
+      "name": "cinnamon stick"
+    },
+    {
+      "name": "fenugreek seeds"
+    },
+    {
+      "name": "mustard seeds"
+    },
+    {
+      "name": "Sri Lankan unroasted curry powder"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "thin coconut milk"
+    },
+    {
+      "name": "thick coconut milk"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "cooking oil"
+    }
+  ],
+  "description": "A mild, gently spiced, and slightly sweet Sri Lankan vegetable curry where sliced carrots are simmered in a fragrant coconut milk gravy."
+}

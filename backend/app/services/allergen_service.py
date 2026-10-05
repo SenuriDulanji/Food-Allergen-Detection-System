@@ -56,8 +56,8 @@ User's declared allergens: {user_allergens}
 Tasks:
 1. Check ALL ingredients (including any hidden allergens inside compound ingredients
    like "curry powder", "curry leaves mix", etc.).
-2. Identify ingredients that belong to any of these allergen categories:
-3. Pay special attention to the user's declared allergens.
+2. Identify ingredients that belong to any of these allergen categories.
+3. Pay special attention to the user's declared allergens. CRITICAL: If you find an ingredient that matches a User's declared allergen, you MUST set the "allergen_category" to the EXACT string the user used (e.g., if the user declared "tomato", output "tomato" not "tomatoes").
 
 ALLERGEN CATEGORY DEFINITIONS & STRICT RULES:
 - milk_dairy: Strictly refers to milk from mammals (cows, buffalo, goats). EXCLUDE coconut milk, soy milk, almond milk, or other plant-based milks.

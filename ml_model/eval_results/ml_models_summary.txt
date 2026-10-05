@@ -1,0 +1,34 @@
+Evaluation of Risk Prediction ML Models: XGBoost, Random Forest, and Logistic Regression
+Methodology: 5-Fold Stratified Cross-Validation with Strict In-Fold Preprocessing (Zero Data Leakage)
+
+=== PRIMARY SUBSET PERFORMANCE (17 ALLERGENS WITH >= 5 CASES) ===
+Note: In 5-fold CV on N=90, targets with >= 5 cases guarantee test positives in every validation fold.
+Logistic Regression    | Acc: 78.24±7.75% | Rec: 36.69±24.83% | F1: 27.89±21.55% | PR-AUC: 0.4190±0.1929 | Brier: 0.1514±0.0450
+Random Forest          | Acc: 84.77±8.93% | Rec: 14.72±16.14% | F1: 17.00±18.44% | PR-AUC: 0.4238±0.1968 | Brier: 0.1168±0.0544
+XGBoost                | Acc: 79.80±9.58% | Rec: 36.44±18.89% | F1: 29.60±17.84% | PR-AUC: 0.4338±0.1442 | Brier: 0.1469±0.0609
+
+=== MACRO-AVERAGE PERFORMANCE ACROSS ALL 24 ALLERGENS (N_pos >= 2) ===
+Note: Includes 7 sparse targets (2-4 cases) where folds without test positives are marked undefined (NaN).
+Logistic Regression    | Acc: 82.08±9.15% | Rec: 27.03±26.24% | F1: 20.45±21.77% | PR-AUC: 0.3562±0.1990 | Brier: 0.1264±0.0559
+Random Forest          | Acc: 88.15±9.21% | Rec: 10.43±15.10% | F1: 12.04±17.29% | PR-AUC: 0.3530±0.2090 | Brier: 0.0936±0.0588
+XGBoost                | Acc: 83.52±10.02% | Rec: 27.89±22.95% | F1: 22.36±19.89% | PR-AUC: 0.3670±0.1778 | Brier: 0.1210±0.0662
+
+=== QUANTITATIVE CALIBRATION ANALYSIS (OUT-OF-FOLD) ===
+Metrics: Calibration Slope (ideal=1.0), Calibration Intercept (ideal=0.0), Expected Calibration Error (ECE)
+Logistic Regression    | Slope: 0.5422 | Intercept: -1.3414 | ECE: 0.1251
+Random Forest          | Slope: 0.6500 | Intercept: -0.8820 | ECE: 0.0552
+XGBoost                | Slope: 0.4295 | Intercept: -1.2246 | ECE: 0.0985
+
+Key Methodological Notes:
+1. Data Leakage Elimination: Both MinMaxScaler and Spearman feature selection (heuristic threshold >= 0.15)
+   were fitted strictly inside each training fold (4/5 of data) and applied out-of-fold.
+   Average features selected across folds: 41.0 ± 0.3 (from 51 candidate features).
+2. Model Selection Justification:
+   - On primary targets (>=5 cases), Logistic Regression achieves the highest Recall (36.69%), matching XGBoost (36.44%).
+   - Logistic Regression was chosen for deployment due to model transparency, interpretable odds ratios,
+     and deterministic edge inference without black-box synthetic oversampling artifacts.
+   - Random Forest achieved the highest Accuracy (84.77%), but low Recall (14.72%) due to majority class bias.
+3. Target Categorization (31 total survey items):
+   - Primary Evaluation: 17 targets with >= 5 positive cases (zero empty CV folds).
+   - Exploratory Evaluation: 7 targets with 2-4 positive cases (high fold variance).
+   - Excluded from Evaluation: 7 targets with < 2 positive cases (insufficient support for stratified CV).

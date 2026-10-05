@@ -1,0 +1,27 @@
+{
+  "dish_name": "gotukola_sambal",
+  "aliases": [
+    "gotukola_sambol"
+  ],
+  "ingredients": [
+    {
+      "name": "gotukola leaves"
+    },
+    {
+      "name": "freshly grated coconut"
+    },
+    {
+      "name": "red onion"
+    },
+    {
+      "name": "green chili"
+    },
+    {
+      "name": "lime juice"
+    },
+    {
+      "name": "salt"
+    }
+  ],
+  "description": "A fresh, healthy Sri Lankan salad made with finely chopped pennywort (gotukola), coconut, and a tangy lime dressing."
+}

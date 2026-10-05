@@ -1,0 +1,47 @@
+{
+  "dish_name": "kos_curry",
+  "aliases": [
+    "kos_mallum",
+    "mature_jackfruit_curry",
+    "jackfruit_curry"
+  ],
+  "ingredients": [
+    {
+      "name": "green jackfruit (kos)"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "mustard seeds"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "black pepper"
+    },
+    {
+      "name": "freshly grated coconut"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "pandan leaf"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "green chili"
+    },
+    {
+      "name": "coconut milk"
+    }
+  ],
+  "description": "A classic Sri Lankan staple where mature green jackfruit is simmered with spices and a roasted coconut-mustard paste."
+}

@@ -19,7 +19,7 @@ graph TD
     G -->|Layer 3: Merge & Deduplicate| J[merge_allergen_results]
     
     F -->|Ingredients + User Profile| K[ML Risk Service]
-    K -->|Layer 4: Clinical XGBoost Models| L[predict_dish_safety]
+    K -->|Layer 4: Clinical Logistic Regression Models| L[predict_dish_safety]
     K -->|Layer 5: Apriori Cross-Reactivity| M[Safety Net Rules]
     
     J --> N[Consolidate Safety Warnings]
@@ -48,10 +48,10 @@ The machine learning pipeline predicts clinical risk for specific allergens base
 * **Purpose**: Trains an independent, optimized machine learning model for *each* identified food allergen.
 * **Logic**:
   1. **Feature Selection (Spearman Correlation)**: Calculates a Spearman correlation matrix between all features (demographics, medical conditions) and the 31 food allergen targets. Features with a maximum correlation below `0.15` (statistical noise threshold) are discarded.
-  2. **Dynamic Architecture Generation**: Iterates through each of the 31 allergens.
-     - **SMOTE + XGBoost**: If an allergen has $\ge$ 4 positive (risk) instances in the dataset, it utilizes a Pipeline combining SMOTE (Synthetic Minority Over-sampling Technique) to handle class imbalance, followed by an `XGBClassifier`.
-     - **Weighted XGBoost**: If there are very few positive instances (< 4), it bypasses SMOTE and instead applies `scale_pos_weight` to an `XGBClassifier` to heavily penalize false negatives.
-  3. **Artifact Serialization**: The trained model pipeline for each food is saved to disk as a `.joblib` file (e.g., `risk_model_prawns.joblib`).
+  2. **Model Training**: Iterates through each of the 31 allergens.
+     - **Class-Weighted Logistic Regression**: Uses a `LogisticRegression` model with `class_weight='balanced'`. This approach outperforms tree-based models on sparse, highly-imbalanced survey data and maximizes recall (minimizing false negatives).
+     - **Imbalance Handling**: The training script automatically skips any allergen target that has fewer than 2 positive cases in the survey data. As a result, 24 optimized allergen models are trained and serialized.
+  3. **Artifact Serialization**: The trained model pipelines for the 24 validated allergens are saved to disk as `.joblib` files (e.g., `risk_model_prawns.joblib`).
 
 ### `scripts/apriory.py`
 * **Purpose**: Discovers hidden association rules between food allergies (cross-reactivity).
@@ -64,15 +64,19 @@ The machine learning pipeline predicts clinical risk for specific allergens base
 The Unified Intelligence Engine that evaluates personalized clinical risk at runtime.
 
 ### `build_feature_vector(user_profile: dict) -> pd.DataFrame`
-* **Purpose**: Translates the user's saved profile into the exact 1D feature vector required by the trained XGBoost models.
+* **Purpose**: Translates the user's saved profile into the exact 1D feature vector required by the trained Logistic Regression models.
 * **Logic**: Initializes a dictionary with default values (`0.0`) for all columns identified during the feature selection phase. It then maps the `user_profile` values (like age, gender, one-hot encoded medical conditions, and blood types) into the correct columns and returns a Pandas DataFrame.
 
 ### `predict_dish_safety(user_profile: dict, detected_ingredients: list) -> dict`
-* **Purpose**: The main ML evaluation function.
+* **Purpose**: The main ML evaluation function with advanced ingredient resolution.
 * **Logic**: 
-  1. **Clinical Prediction (XGBoost)**: Loops through every single ingredient in the dish one by one. It normalizes each detected ingredient name and checks if a specific trained `.joblib` model exists for it. If a model exists, it uses the user's `feature_vector` to predict the risk. Crucially, the system only generates a `ClinicalAlert` if the model predicts a high risk (output of `1` or a probability crossing the threshold). If the model predicts an ingredient is safe for the specific user, or if there is no model trained for that ingredient (e.g., "garlic"), it stays completely silent to avoid cluttering the results.
-  2. **Apriori Safety Net**: Cross-references the detected ingredients against the `SAFETY_RULES` dictionary. If the dish contains an ingredient known to co-react with another allergen, a `SafetyNetWarning` is generated (e.g., "Contains prawns, which cross-reacts with cuttlefish/crab").
-  3. Returns a consolidated `MLRiskReport`.
+  1. **Advanced Ingredient Resolution (`_resolve_ingredient_key`)**: Before checking models, it rigorously normalizes ingredients using a 3-tier system:
+     - *Synonym Mapping*: Maps complex phrases (e.g. "peanut butter" -> "peanuts", "coconut milk" -> "coconut") using a prioritized dictionary `INGREDIENT_SYNONYMS` to avoid false partial matches (e.g., matching "milk" in "coconut milk").
+     - *Exact Match*: Checks if the ingredient name precisely matches a known model key.
+     - *Substring Search*: Looks for known allergen model keys embedded within the ingredient phrase (e.g. "prawns" in "fresh jumbo prawns").
+  2. **Clinical Prediction (Logistic Regression)**: For each resolved ingredient, it checks if a specific trained `.joblib` model exists. If so, it uses the user's `feature_vector` to predict the risk. It only generates a `ClinicalAlert` if the model predicts a high risk (output of `1` or a probability crossing the threshold). If the model predicts an ingredient is safe, it stays completely silent to avoid cluttering the results.
+  3. **Apriori Safety Net (`_resolve_apriori_key`)**: Cross-references the resolved ingredients against the `SAFETY_RULES` dictionary using similar normalisation. If the dish contains an ingredient known to co-react with another allergen, a `SafetyNetWarning` is generated (e.g., "Contains prawns, which cross-reacts with cuttlefish/crab").
+  4. Returns a consolidated `MLRiskReport` while strictly avoiding duplicate alerts for the same underlying allergen phrase.
 
 ---
 
@@ -99,7 +103,7 @@ Handles image visual analysis and similarity searches to determine the correct d
 
 ### `identify_dish_from_image(image_bytes: bytes) -> str`
 * **Purpose**: Performs Gemini Vision analysis to guess the dish name.
-* **Logic**: Optimizes image bytes using PIL. Sends the image along with `VISION_PROMPT` to the `gemini-2.5-flash` model to respond solely with a snake_case name of a known dish.
+* **Logic**: Optimizes image bytes using PIL. Sends the image along with `VISION_PROMPT` to the `gemini-3.1-flash-lite` model to respond solely with a snake_case name of a known dish.
 
 ### `retrieve_recipe_context(dish_guess: str, top_k: int) -> list[dict]`
 * **Purpose**: Queries ChromaDB using the vision-guessed dish name.
@@ -160,30 +164,54 @@ A fast, local dictionary-based matcher.
 * **Logic**: Quickly matches lowercase substrings (e.g. if the ingredient contains "wheat", it triggers the "gluten" allergen). To optimize performance, it only scans categories of interest to the user if a profile is provided.
 
 
-Viewed rag_service.py:97-97
-Viewed rag_service.py:110-249
-Edited rag_service.py
+---
 
-I have upgraded the backend logging so you can trace exactly what the AI is thinking at each step! 
+## 9. Backend Logging & Tracing
+
+The backend logging has been upgraded so you can trace exactly what the AI is thinking at each step! 
 
 Whenever an image is uploaded and processed, you can now look at your `uvicorn` terminal, and you will see a detailed, step-by-step trace of the **Multimodal Dish Identification** process. 
 
 Here is what happens during the identification, and exactly what will be logged in your terminal:
 
-1. **Vision Initial Guess (Gemini 2.5 Flash)**: 
+1. **Vision Initial Guess (Gemini 3.1 Flash Lite)**: 
    The AI looks at the raw image first and makes a zero-shot guess at what Sri Lankan dish it might be.
    > 📝 *Log: `Vision model guessed dish: 'kottu_roti'`*
 
 2. **Text RAG Retrieval (ChromaDB)**: 
    The system takes that guess and queries your text vector database, retrieving the closest matching recipe and ingredient contexts to anchor the AI in verified data.
-   > 📝 *Log: `Text RAG retrieved 3 chunks for query 'kottu_roti'. Matches: ['kottu_roti', 'kottu_roti', 'chicken_kottu']`*
+   > 📝 *Log: `Text RAG retrieved 3 chunks for query 'kottu_roti'. Matches: ['kottu_roti', 'kottu_roti', 'chicken_kottu'`]*
 
 3. **Image RAG Retrieval (CLIP + ChromaDB)**: 
    In parallel, the system passes the uploaded image through the CLIP neural network, converts it to a mathematical vector, and searches your image database for visually similar dish photos. It retrieves the closest visual matches and calculates how similar they are (the lower the distance, the more identical the image).
    > 📝 *Log: `Image RAG retrieved 3 matches. Visual matches: ['chicken_kottu (dist: 0.2314)', 'vegetable_kottu (dist: 0.3129)', 'string_hopper_kottu (dist: 0.4501)']`*
 
-4. **Final Hybrid Reasoning (Gemini 2.5 Flash)**: 
+4. **Final Hybrid Reasoning (Gemini 3.1 Flash Lite)**: 
    The system gives the LLM all three pieces of context—its original visual guess, the text recipe matches, and the visually similar CLIP matches—and asks it to make a final, highly-confident conclusion about the dish.
    > 📝 *Log: `Final reasoning result: 'chicken_kottu' (Original Vision Guess: 'kottu_roti')`*
 
 You can test this right now by scanning a dish on the frontend. Check your backend terminal window immediately after clicking "Scan for Allergens," and you'll see this entire four-step thought process printed out in real-time!
+
+---
+
+## 10. Frontend UI Integration
+
+The Next.js frontend application provides an intuitive interface for users to scan dishes and view comprehensive safety reports.
+
+### Allergen Reports & Expandable UI (`frontend/app/scan/page.tsx`)
+* **Purpose**: Displays the results of the backend analysis, including detected ingredients, allergens, and clinical risk predictions.
+* **Logic**: 
+  1. **Scan Results Presentation**: Once a dish is scanned, the UI displays the identified dish name and an overall safety status.
+  2. **Expandable "Read More" Component**: Contains detailed information grouped into distinct sections to avoid overwhelming the user initially.
+     - **Detected Allergens**: Lists specific allergens identified in the dish by the hybrid rule-based and LLM engines. If no allergens are detected, it presents a clear "Safe" empty state with a success indicator, ensuring the user isn't left guessing.
+     - **ML Risk Report**: Displays personalized clinical risk predictions and Apriori safety net warnings generated by the `ml_risk_service.py`. This ensures users receive nuanced, data-driven explanations for any flagged risks.
+
+### User Profile Management (`frontend/app/profile/page.tsx`)
+* **Purpose**: A comprehensive, modern interface for users to build and maintain their health and demographic profile.
+* **Logic**: 
+  1. **Profile Loading & Creation**: Users can load an existing profile using their unique ID or create a new one through an interactive, multi-step form.
+  2. **Data Collection**: 
+     - **Demographics**: Collects basic information (Age, Gender, Province) for statistical risk modeling.
+     - **Health Profile**: Gathers medical conditions, dietary patterns, and specific health flags (like lactose intolerance or personal allergy history) used by the Logistic Regression clinical models.
+     - **Allergen Selection**: Provides grouped, easy-to-select toggles for all known food allergens.
+  3. **Responsive Glassmorphism UI**: Uses a premium, spacious layout with dynamic grid systems and smooth transitions to make filling out the medical form an engaging experience.

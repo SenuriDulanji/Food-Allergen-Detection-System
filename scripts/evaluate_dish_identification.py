@@ -55,10 +55,11 @@ sys.path.insert(0, str(BACKEND_DIR))
 logging.basicConfig(level=logging.WARNING)
 
 # ── project imports ──────────────────────────────────────────────────────── #
+# pyrefly: ignore [missing-import]
 from app.services.rag_service import RAGService          # noqa: E402
 
 # ── constants ────────────────────────────────────────────────────────────── #
-TEST_IMAGES_DIR = PROJECT_ROOT / "dataset" / "test-images"
+TEST_IMAGES_DIR = PROJECT_ROOT / "dataset" / "test-images"/"Unseen Data"
 RESULTS_DIR     = PROJECT_ROOT / "scripts" / "eval_results"
 SUPPORTED_EXTS  = {".jpg", ".jpeg", ".png", ".webp"}
 
@@ -73,12 +74,53 @@ def _normalise(name: str) -> str:
     """Lower-case, strip, collapse spaces/dashes to underscores."""
     return name.strip().lower().replace(" ", "_").replace("-", "_")
 
+KNOWN_CLASSES = {
+    "bandakka_curry",
+    "batu_moju",
+    "beef_curry",
+    "beetroot_curry",
+    "cashew_curry",
+    "chicken_curry",
+    "crab_curry",
+    "dell_curry",
+    "dhal_curry",
+    "dry_fish_curry",
+    "egg_curry",
+    "egg_hoppers",      
+    "fish_ambulthiyal",
+    "fish_curry",
+    "fish_cutlets",
+    "gotukola_sambal",
+    "green_beans_curry",
+    "hot_butter_cuttlefish",
+    "isso_vade",
+    "karawila_curry",
+    "kos_curry",
+    "milk_rice",
+    "mutton_curry",
+    "pittu",
+    "plain_hoppers",
+    "pol_roti",
+    "pol_sambal",
+    "polos_curry",       
+    "pork_curry",
+    "potato_curry",
+    "prawn_curry",
+    "soya_meat_curry",
+    "squid_curry",
+    "string_hoppers"
+}
+
+def _normalise(name: str) -> str:
+    """Lowercase and replace spaces/hyphens with underscores."""
+    return str(name).strip().lower().replace(" ", "_").replace("-", "_")
+
 
 # ─────────────────────────────────────────────────────────────────────────── #
 #  Helper: build list of (image_path, ground_truth_label) tuples               #
 # ─────────────────────────────────────────────────────────────────────────── #
 
-def collect_test_samples(max_per_class: int | None = None) -> list[tuple[Path, str]]:
+def collect_test_samples(max_per_class: int | None = None, classes_filter: list[str] | None = None) -> list[tuple[Path, str]]:
     samples: list[tuple[Path, str]] = []
 
     if not TEST_IMAGES_DIR.exists():
@@ -92,6 +134,9 @@ def collect_test_samples(max_per_class: int | None = None) -> list[tuple[Path, s
         sys.exit(1)
 
     for class_dir in class_dirs:
+        if classes_filter and class_dir.name not in classes_filter:
+            continue
+
         images = sorted(
             p for p in class_dir.iterdir()
             if p.is_file() and p.suffix.lower() in SUPPORTED_EXTS
@@ -126,10 +171,14 @@ def get_top3_from_rag(rag_service: RAGService, image_bytes: bytes) -> tuple[str,
     # To get Top-3, we peek into the text RAG retrieval internally.
     # If RAGService is extended to return candidates, use that.
     # For now we construct a best-effort Top-3:
-    #   Slot 1  →  top1  (the final reasoning answer)
-    #   Slots 2-3  →  populated from 'candidates' key if present (future-proof)
+    #   Slot 1  ->  top1  (the final reasoning answer)
+    #   Slots 2-3  ->  populated from 'candidates' key if present (future-proof)
     candidates: list[str] = result.get("candidates", [])
-    top3 = [top1] + [_normalise(c) for c in candidates if _normalise(c) != top1]
+    top3 = [top1]
+    for c in candidates:
+        c_norm = _normalise(c)
+        if c_norm not in top3:
+            top3.append(c_norm)
     top3 = top3[:TOP_K]   # cap at 3
 
     return top1, top3, elapsed
@@ -139,7 +188,7 @@ def get_top3_from_rag(rag_service: RAGService, image_bytes: bytes) -> tuple[str,
 #  Main evaluation loop                                                        #
 # ─────────────────────────────────────────────────────────────────────────── #
 
-def run_evaluation(max_per_class: int | None = None) -> None:
+def run_evaluation(max_per_class: int | None = None, classes_filter: list[str] | None = None) -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -152,7 +201,7 @@ def run_evaluation(max_per_class: int | None = None) -> None:
     print("=" * 65)
 
     # ── Collect samples ──────────────────────────────────────────────── #
-    samples = collect_test_samples(max_per_class)
+    samples = collect_test_samples(max_per_class, classes_filter)
     classes = sorted({label for _, label in samples})
 
     print(f"\n  Classes   : {len(classes)}")
@@ -182,6 +231,8 @@ def run_evaluation(max_per_class: int | None = None) -> None:
     conf_matrix: dict[str, dict[str, int]] = {c: {c2: 0 for c2 in classes} for c in classes}
 
     csv_rows: list[dict] = []
+    y_true: list[str] = []
+    y_pred: list[str] = []
 
     # ── Iterate over every test image ────────────────────────────────── #
     for idx, (img_path, ground_truth) in enumerate(samples, start=1):
@@ -200,13 +251,12 @@ def run_evaluation(max_per_class: int | None = None) -> None:
                 break
             except Exception as exc:
                 exc_str = str(exc)
-                if "429" in exc_str or "RESOURCE_EXHAUSTED" in exc_str:
-                    # Sleep for a full 65 seconds to allow the 1-minute sliding window to reset completely.
-                    # This prevents resetting the rate-limit window with early requests.
+                if any(x in exc_str for x in ["429", "RESOURCE_EXHAUSTED", "503", "UNAVAILABLE"]):
+                    # Sleep for a full 65 seconds to allow the window to reset or wait out the server overload.
                     sleep_seconds = 65.0
                     print(
-                        f"  [RATE LIMIT] Attempt {attempt}/{max_retries} failed for {img_path.name}. "
-                        f"Sleeping {sleep_seconds:.1f}s to reset window..."
+                        f"  [API LIMIT/OVERLOAD] Attempt {attempt}/{max_retries} failed for {img_path.name}. "
+                        f"Sleeping {sleep_seconds:.1f}s to retry..."
                     )
                     time.sleep(sleep_seconds)
                 else:
@@ -231,6 +281,9 @@ def run_evaluation(max_per_class: int | None = None) -> None:
         top3_correct += int(is_top3)
         total        += 1
         total_time   += elapsed
+
+        y_true.append(ground_truth)
+        y_pred.append(top1 if top1 in classes else "unknown")
 
         per_class[ground_truth]["total"] += 1
         if is_top1:
@@ -274,7 +327,7 @@ def run_evaluation(max_per_class: int | None = None) -> None:
     summary_lines = [
         "",
         "=" * 65,
-        "  EVALUATION SUMMARY",
+        "  EVALUATION SUMMARY" ,
         "=" * 65,
         f"  Total Images Tested  : {len(samples)}",
         f"  Successfully Eval'd  : {evaluated}",
@@ -299,6 +352,21 @@ def run_evaluation(max_per_class: int | None = None) -> None:
         summary_lines.append(
             f"  {cls:<25}  Top-1: {t1p:5.1f}%  Top-3: {t3p:5.1f}%  (n={n})"
         )
+
+    summary_lines += [
+        "",
+        "-" * 65,
+        "  Classification Report (Precision, Recall, F1-Score)",
+        "-" * 65,
+    ]
+    
+    try:
+        from sklearn.metrics import classification_report
+        # Calculate precision, recall, f1 for all classes
+        report_str = classification_report(y_true, y_pred, labels=classes, zero_division=0)
+        summary_lines.append(report_str)
+    except ImportError:
+        summary_lines.append("  [INFO] scikit-learn not installed — skipping precision/recall/f1 calculation.")
 
     summary_lines += [
         "",
@@ -337,8 +405,8 @@ def run_evaluation(max_per_class: int | None = None) -> None:
     with open(txt_path, "w", encoding="utf-8") as f:
         f.write(output_text)
 
-    print(f"\n  Saved CSV     → {csv_path}")
-    print(f"  Saved Summary → {txt_path}\n")
+    print(f"\n  Saved CSV     -> {csv_path}")
+    print(f"  Saved Summary -> {txt_path}\n")
 
     # ── Optional: save confusion matrix as PNG ────────────────────────── #
     try:
@@ -376,7 +444,7 @@ def run_evaluation(max_per_class: int | None = None) -> None:
         png_path = RESULTS_DIR / f"confusion_matrix_{timestamp}.png"
         plt.savefig(png_path, dpi=150)
         plt.close()
-        print(f"  Saved Confusion Matrix → {png_path}\n")
+        print(f"  Saved Confusion Matrix -> {png_path}\n")
     except ImportError:
         print("  [INFO] matplotlib not installed — skipping confusion matrix PNG.")
 
@@ -386,16 +454,11 @@ def run_evaluation(max_per_class: int | None = None) -> None:
 # ─────────────────────────────────────────────────────────────────────────── #
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Evaluate the Multimodal RAG dish-identification pipeline."
-    )
-    parser.add_argument(
-        "--max-per-class",
-        type=int,
-        default=None,
-        metavar="N",
-        help="Limit evaluation to N images per class (useful for quick tests).",
-    )
+    parser = argparse.ArgumentParser(description="Evaluate Dish Identification via RAGService.")
+    parser.add_argument("--max-per-class", type=int, default=None,
+                        help="Limit the number of images to evaluate per class (useful for quick tests).")
+    parser.add_argument("--classes", type=str, nargs="+", default=None,
+                        help="Evaluate only on these specific class folder names (e.g. --classes koththu egg_hopper)")
     args = parser.parse_args()
 
-    run_evaluation(max_per_class=args.max_per_class)
+    run_evaluation(max_per_class=args.max_per_class, classes_filter=args.classes)

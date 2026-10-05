@@ -1,19 +1,49 @@
 {
   "dish_name": "potato_curry",
+  "aliases": [
+    "ala_hodhi",
+    "ala_kiriya"
+  ],
   "ingredients": [
-    {"name": "potatoes"},
-    {"name": "onion"},
-    {"name": "green chili"},
-    {"name": "garlic"},
-    {"name": "curry leaves"},
-    {"name": "pandan leaf"},
-    {"name": "fenugreek seeds"},
-    {"name": "mustard seeds"},
-    {"name": "cinnamon stick"},
-    {"name": "turmeric powder"},
-    {"name": "Sri Lankan unroasted curry powder"},
-    {"name": "coconut milk"},
-    {"name": "salt"}
+    {
+      "name": "potatoes"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "green chili"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "pandan leaf"
+    },
+    {
+      "name": "fenugreek seeds"
+    },
+    {
+      "name": "mustard seeds"
+    },
+    {
+      "name": "cinnamon stick"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "Sri Lankan unroasted curry powder"
+    },
+    {
+      "name": "coconut milk"
+    },
+    {
+      "name": "salt"
+    }
   ],
   "description": "Tender pieces of potato simmered in a mild, fragrant coconut milk gravy tempered with traditional spices."
 }

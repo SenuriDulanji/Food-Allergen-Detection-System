@@ -1,0 +1,66 @@
+
+=================================================================
+  EVALUATION SUMMARY 
+=================================================================
+  Total Images Tested  : 50
+  Successfully Eval'd  : 50
+  Errors / Skipped     : 0
+
+  Top-1 Accuracy       : 76.00%  (38/50)
+  Top-3 Accuracy       : 82.00%  (41/50)
+  Average Inference Time: 4.24 seconds
+  Total Inference Time : 212.08 seconds
+
+-----------------------------------------------------------------
+  Per-Class Accuracy
+-----------------------------------------------------------------
+  cashew_curry               Top-1: 100.0%  Top-3: 100.0%  (n=5)
+  chicken_curry              Top-1: 100.0%  Top-3: 100.0%  (n=5)
+  crab_curry                 Top-1:  60.0%  Top-3:  80.0%  (n=5)
+  dhal_curry                 Top-1:  80.0%  Top-3:  80.0%  (n=5)
+  egg_curry                  Top-1: 100.0%  Top-3: 100.0%  (n=5)
+  fish_curry                 Top-1:  80.0%  Top-3:  80.0%  (n=5)
+  mutton_curry               Top-1:   0.0%  Top-3:  40.0%  (n=5)
+  pol_sambal                 Top-1: 100.0%  Top-3: 100.0%  (n=5)
+  potato_curry               Top-1:  40.0%  Top-3:  40.0%  (n=5)
+  prawn_curry                Top-1: 100.0%  Top-3: 100.0%  (n=5)
+
+-----------------------------------------------------------------
+  Classification Report (Precision, Recall, F1-Score)
+-----------------------------------------------------------------
+               precision    recall  f1-score   support
+
+ cashew_curry       1.00      1.00      1.00         5
+chicken_curry       0.83      1.00      0.91         5
+   crab_curry       1.00      0.60      0.75         5
+   dhal_curry       1.00      0.80      0.89         5
+    egg_curry       1.00      1.00      1.00         5
+   fish_curry       1.00      0.80      0.89         5
+ mutton_curry       0.00      0.00      0.00         5
+   pol_sambal       1.00      1.00      1.00         5
+ potato_curry       1.00      0.40      0.57         5
+  prawn_curry       1.00      1.00      1.00         5
+
+    micro avg       0.97      0.76      0.85        50
+    macro avg       0.88      0.76      0.80        50
+ weighted avg       0.88      0.76      0.80        50
+
+
+-----------------------------------------------------------------
+  Confusion Matrix  (rows=Ground Truth, cols=Predicted)
+-----------------------------------------------------------------
+  GT \ Pred      cashew_curry     chicken_curry    crab_curry       dhal_curry       egg_curry        fish_curry       mutton_curry     pol_sambal       potato_curry     prawn_curry    
+  cashew_curry   5                0                0                0                0                0                0                0                0                0              
+  chicken_curry  0                5                0                0                0                0                0                0                0                0              
+  crab_curry     0                1                3                0                0                0                0                0                0                0              
+  dhal_curry     0                0                0                4                0                0                0                0                0                0              
+  egg_curry      0                0                0                0                5                0                0                0                0                0              
+  fish_curry     0                0                0                0                0                4                0                0                0                0              
+  mutton_curry   0                0                0                0                0                0                0                0                0                0              
+  pol_sambal     0                0                0                0                0                0                0                5                0                0              
+  potato_curry   0                0                0                0                0                0                0                0                2                0              
+  prawn_curry    0                0                0                0                0                0                0                0                0                5              
+
+  Results CSV : C:\Users\User\Desktop\Food-Allergen-Detection-System\scripts\eval_results\results_20260707_225149.csv
+  Summary TXT : C:\Users\User\Desktop\Food-Allergen-Detection-System\scripts\eval_results\summary_20260707_225149.txt
+=================================================================

@@ -1,0 +1,46 @@
+{
+  "dish_name": "fish_cutlets",
+  "aliases": [],
+  "ingredients": [
+    {
+      "name": "canned fish (mackerel or tuna) or boiled fish"
+    },
+    {
+      "name": "potatoes (boiled and mashed)"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "green chili"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "ginger"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "black pepper"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "lime juice"
+    },
+    {
+      "name": "eggs"
+    },
+    {
+      "name": "breadcrumbs"
+    },
+    {
+      "name": "cooking oil (for deep frying)"
+    }
+  ],
+  "description": "A classic Sri Lankan 'short eat' featuring a spiced mixture of flaked fish and mashed potatoes, rolled into bite-sized balls, coated in egg and breadcrumbs, and deep-fried until golden and crispy."
+}

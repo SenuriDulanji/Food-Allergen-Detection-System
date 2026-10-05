@@ -1,0 +1,45 @@
+
+=================================================================
+  EVALUATION SUMMARY
+=================================================================
+  Total Images Tested  : 15
+  Successfully Eval'd  : 15
+  Errors / Skipped     : 0
+
+  Top-1 Accuracy       : 40.00%  (6/15)
+  Top-3 Accuracy       : 40.00%  (6/15)
+  Average Inference Time: 17.71 seconds
+  Total Inference Time : 265.62 seconds
+
+-----------------------------------------------------------------
+  Per-Class Accuracy
+-----------------------------------------------------------------
+  koththu                    Top-1:  80.0%  Top-3:  80.0%  (n=5)
+  pumpkin_curry              Top-1:   0.0%  Top-3:   0.0%  (n=5)
+  seeni_sambol               Top-1:  40.0%  Top-3:  40.0%  (n=5)
+
+-----------------------------------------------------------------
+  Classification Report (Precision, Recall, F1-Score)
+-----------------------------------------------------------------
+               precision    recall  f1-score   support
+
+      koththu       1.00      0.80      0.89         5
+pumpkin_curry       0.00      0.00      0.00         5
+ seeni_sambol       1.00      0.40      0.57         5
+
+    micro avg       1.00      0.40      0.57        15
+    macro avg       0.67      0.40      0.49        15
+ weighted avg       0.67      0.40      0.49        15
+
+
+-----------------------------------------------------------------
+  Confusion Matrix  (rows=Ground Truth, cols=Predicted)
+-----------------------------------------------------------------
+  GT \ Pred      koththu          pumpkin_curry    seeni_sambol   
+  koththu        4                0                0              
+  pumpkin_curry  0                0                0              
+  seeni_sambol   0                0                2              
+
+  Results CSV : C:\Users\User\Desktop\Food-Allergen-Detection-System\scripts\eval_results\results_20260718_001857.csv
+  Summary TXT : C:\Users\User\Desktop\Food-Allergen-Detection-System\scripts\eval_results\summary_20260718_001857.txt
+=================================================================

@@ -1,0 +1,73 @@
+Allergen,Positive_Cases,Model,TP,FP,TN,FN
+beef,27,Logistic Regression,20,13,50,7
+beef,27,Random Forest,10,7,56,17
+beef,27,XGBoost,14,17,46,13
+coconut,2,Logistic Regression,0,3,85,2
+coconut,2,Random Forest,0,0,88,2
+coconut,2,XGBoost,0,3,85,2
+crab,18,Logistic Regression,12,16,56,6
+crab,18,Random Forest,4,6,66,14
+crab,18,XGBoost,10,11,61,8
+cumin,6,Logistic Regression,1,10,74,5
+cumin,6,Random Forest,0,0,84,6
+cumin,6,XGBoost,0,4,80,6
+cuttlefish / squid,18,Logistic Regression,10,14,58,8
+cuttlefish / squid,18,Random Forest,3,4,68,15
+cuttlefish / squid,18,XGBoost,11,10,62,7
+dry_fish,4,Logistic Regression,0,9,77,4
+dry_fish,4,Random Forest,0,1,85,4
+dry_fish,4,XGBoost,0,4,82,4
+eggs,3,Logistic Regression,0,1,86,3
+eggs,3,Random Forest,0,0,87,3
+eggs,3,XGBoost,0,3,84,3
+fenugreek,2,Logistic Regression,0,6,82,2
+fenugreek,2,Random Forest,0,1,87,2
+fenugreek,2,XGBoost,0,5,83,2
+jackfruit,2,Logistic Regression,0,2,86,2
+jackfruit,2,Random Forest,0,0,88,2
+jackfruit,2,XGBoost,0,1,87,2
+milk,13,Logistic Regression,7,16,61,6
+milk,13,Random Forest,5,3,74,8
+milk,13,XGBoost,6,17,60,7
+mustard,4,Logistic Regression,0,8,78,4
+mustard,4,Random Forest,0,0,86,4
+mustard,4,XGBoost,0,6,80,4
+mutton,18,Logistic Regression,9,18,54,9
+mutton,18,Random Forest,3,7,65,15
+mutton,18,XGBoost,8,10,62,10
+peanuts,5,Logistic Regression,0,10,75,5
+peanuts,5,Random Forest,0,0,85,5
+peanuts,5,XGBoost,1,7,78,4
+pineapple,13,Logistic Regression,6,12,65,7
+pineapple,13,Random Forest,4,3,74,9
+pineapple,13,XGBoost,6,13,64,7
+pork,31,Logistic Regression,18,17,42,13
+pork,31,Random Forest,11,9,50,20
+pork,31,XGBoost,18,16,43,13
+prawns,17,Logistic Regression,10,14,59,7
+prawns,17,Random Forest,4,3,70,13
+prawns,17,XGBoost,7,18,55,10
+rambutan,6,Logistic Regression,2,7,77,4
+rambutan,6,Random Forest,0,0,84,6
+rambutan,6,XGBoost,3,5,79,3
+sesame,5,Logistic Regression,1,8,77,4
+sesame,5,Random Forest,0,1,84,5
+sesame,5,XGBoost,1,5,80,4
+soy,5,Logistic Regression,0,9,76,5
+soy,5,Random Forest,0,1,84,5
+soy,5,XGBoost,1,7,78,4
+spicy_oily,18,Logistic Regression,5,22,50,13
+spicy_oily,18,Random Forest,2,8,64,16
+spicy_oily,18,XGBoost,3,20,52,15
+tomato,4,Logistic Regression,1,5,81,3
+tomato,4,Random Forest,0,0,86,4
+tomato,4,XGBoost,2,6,80,2
+tree_nuts,6,Logistic Regression,0,9,75,6
+tree_nuts,6,Random Forest,0,1,83,6
+tree_nuts,6,XGBoost,2,6,78,4
+tuna,11,Logistic Regression,3,16,63,8
+tuna,11,Random Forest,0,4,75,11
+tuna,11,XGBoost,2,10,69,9
+wheat,5,Logistic Regression,1,5,80,4
+wheat,5,Random Forest,0,0,85,5
+wheat,5,XGBoost,1,5,80,4

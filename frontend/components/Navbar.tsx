@@ -30,7 +30,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-4">
           {NAV_LINKS.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;
             return (
@@ -51,12 +51,12 @@ export default function Navbar() {
         </nav>
 
         {/* CTA */}
-        <div className="hidden md:flex items-center gap-5">
+        <div className="hidden md:flex items-center ml-4">
           <Link
             href="/scan"
-            className="btn-primary px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+            className="btn-primary px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
           >
-            <ScanLine size={15} />
+            <ScanLine size={16} />
             Scan Now
           </Link>
         </div>

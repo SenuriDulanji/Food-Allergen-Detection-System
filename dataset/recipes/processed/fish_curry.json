@@ -1,27 +1,70 @@
 {
-    "dish_name": "fish_curry",
-    "ingredients": [
-      {"name": "fish"},
-      {"name": "garlic"},
-      {"name": "small red onion"},
-      {"name": "cardamom"},
-      {"name": "aniseed"},
-      {"name": "lemongrass"},
-      {"name": "black pepper"},
-      {"name": "chili powder"},
-      {"name": "lime"},
-      {"name": "turmeric"},
-      {"name": "sweet potatoes"},
-      {"name": "bell pepper"},
-      {"name": "ginger"},
-      {"name": "cinnamon"},
-      {"name": "fenugreek seeds"},
-      {"name": "curry leaves"},
-      {"name": "green onion"},
-      {"name": "dry chilly"},
-      {"name": "chili flakes"},
-      {"name": "salt"},
-      {"name": "dry basil"}
-    ],
-    "description": "Fish portions marinated in lime and turmeric, then cooked with a roasted spice blend, sweet potatoes, and bell peppers"
-  }
+  "dish_name": "fish_curry",
+  "aliases": [],
+  "ingredients": [
+    {
+      "name": "fish"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "small red onion"
+    },
+    {
+      "name": "cardamom"
+    },
+    {
+      "name": "aniseed"
+    },
+    {
+      "name": "lemongrass"
+    },
+    {
+      "name": "black pepper"
+    },
+    {
+      "name": "chili powder"
+    },
+    {
+      "name": "lime"
+    },
+    {
+      "name": "turmeric"
+    },
+    {
+      "name": "sweet potatoes"
+    },
+    {
+      "name": "bell pepper"
+    },
+    {
+      "name": "ginger"
+    },
+    {
+      "name": "cinnamon"
+    },
+    {
+      "name": "fenugreek seeds"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "green onion"
+    },
+    {
+      "name": "dry chilly"
+    },
+    {
+      "name": "chili flakes"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "dry basil"
+    }
+  ],
+  "description": "Fish portions marinated in lime and turmeric, then cooked with a roasted spice blend, sweet potatoes, and bell peppers"
+}

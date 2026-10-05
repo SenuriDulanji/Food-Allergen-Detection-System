@@ -1,0 +1,44 @@
+{
+  "dish_name": "fish_ambulthiyal",
+  "aliases": [
+    "ambul_thiyal",
+    "maalu_ambulthiyal",
+    "fish_abul_thiyal"
+  ],
+  "ingredients": [
+    {
+      "name": "Skipjack tuna fish (Bala malu)"
+    },
+    {
+      "name": "Garcinia (Goraka) paste"
+    },
+    {
+      "name": "Pepper"
+    },
+    {
+      "name": "Chili powder"
+    },
+    {
+      "name": "Turmeric powder"
+    },
+    {
+      "name": "Ginger"
+    },
+    {
+      "name": "Bird chili"
+    },
+    {
+      "name": "Cinnamon"
+    },
+    {
+      "name": "Garlic"
+    },
+    {
+      "name": "Cardamon"
+    },
+    {
+      "name": "Canereed leaves (Thebu leaves)"
+    }
+  ],
+  "description": "A traditional Sri Lankan sour fish curry where pieces of fish are wrapped in leaves, coated in a dark paste of garcinia (goraka) and spices, and slow-cooked in a clay pot"
+}

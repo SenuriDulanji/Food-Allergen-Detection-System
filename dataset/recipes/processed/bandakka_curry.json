@@ -1,0 +1,43 @@
+{
+  "dish_name": "bandakka_curry",
+  "aliases": [],
+  "ingredients": [
+    {
+      "name": "okra (ladies’ fingers)"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "oil"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "curry powder"
+    },
+    {
+      "name": "ground Maldive fish or dried prawns"
+    },
+    {
+      "name": "cinnamon stick"
+    },
+    {
+      "name": "dill seeds"
+    },
+    {
+      "name": "coconut milk"
+    },
+    {
+      "name": "lime juice"
+    },
+    {
+      "name": "salt"
+    }
+  ],
+  "description": "Deep-fried okra pieces simmered in a light coconut milk gravy with onions, spices, and Maldive fish."
+}

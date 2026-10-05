@@ -37,6 +37,11 @@ def create_user(db: Session, user_in: UserCreate) -> User:
         lactose_intolerance=user_in.lactose_intolerance,
         outside_food_frequency=user_in.outside_food_frequency,
         personal_allergy_history=user_in.personal_allergy_history,
+        work_env=user_in.work_env,
+        family_has_history=user_in.family_has_history,
+        family_asthma=user_in.family_asthma,
+        family_eczema=user_in.family_eczema,
+        family_allergies=",".join(user_in.family_allergies) if user_in.family_allergies else None,
     )
     
     db.add(db_user)
@@ -84,6 +89,11 @@ def update_user(db: Session, db_user: User, user_in: UserUpdate) -> User:
         val = update_data.pop("medical_conditions")
         db_user.medical_conditions = ",".join(val) if val else None
 
+    # Handle family_allergies separately
+    if "family_allergies" in update_data:
+        val = update_data.pop("family_allergies")
+        db_user.family_allergies = ",".join(val) if val else None
+
     # Update other demographic/profile attributes
     for field, value in update_data.items():
         setattr(db_user, field, value)
@@ -119,6 +129,11 @@ def format_user_response(db_user: User) -> dict:
         "lactose_intolerance": db_user.lactose_intolerance,
         "outside_food_frequency": db_user.outside_food_frequency,
         "personal_allergy_history": db_user.personal_allergy_history,
+        "work_env": db_user.work_env,
+        "family_has_history": db_user.family_has_history,
+        "family_asthma": db_user.family_asthma,
+        "family_eczema": db_user.family_eczema,
+        "family_allergies": db_user.family_allergies.split(",") if db_user.family_allergies else [],
         "is_active": db_user.is_active,
         "allergens": [a.allergen_category for a in db_user.allergens],
         "created_at": db_user.created_at,

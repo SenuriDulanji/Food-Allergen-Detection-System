@@ -28,6 +28,11 @@ class User(Base):
     lactose_intolerance = Column(Boolean, nullable=True)
     outside_food_frequency = Column(Integer, nullable=True)
     personal_allergy_history = Column(Boolean, nullable=True)
+    work_env = Column(String, nullable=True)
+    family_has_history = Column(Boolean, nullable=True)
+    family_asthma = Column(Boolean, nullable=True)
+    family_eczema = Column(Boolean, nullable=True)
+    family_allergies = Column(String, nullable=True) # Stored as comma-separated
     
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

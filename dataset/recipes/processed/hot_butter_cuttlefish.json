@@ -1,0 +1,37 @@
+{
+  "dish_name": "hot_butter_cuttlefish",
+  "aliases": [
+    "hbc",
+    "cuttlefish"
+  ],
+  "ingredients": [
+    {
+      "name": "cuttlefish rings"
+    },
+    {
+      "name": "corn flour"
+    },
+    {
+      "name": "chili paste or chili powder"
+    },
+    {
+      "name": "butter"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "spring onions"
+    },
+    {
+      "name": "sugar"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "oil (for deep frying)"
+    }
+  ],
+  "description": "A beloved Sri Lankan-Chinese fusion dish featuring crispy, batter-fried cuttlefish tossed in a sweet, spicy, and buttery sauce."
+}

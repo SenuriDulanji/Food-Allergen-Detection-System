@@ -1,21 +1,55 @@
 {
-    "dish_name": "dhal_curry",
-    "ingredients": [
-      {"name": "channa dhal or yellow split peas"},
-      {"name": "oil"},
-      {"name": "onion"},
-      {"name": "garlic"},
-      {"name": "curry leaves"},
-      {"name": "dried finger-length chillies"},
-      {"name": "pandanus leaf"},
-      {"name": "mustard seeds"},
-      {"name": "curry powder"},
-      {"name": "turmeric powder"},
-      {"name": "Maldive fish or dried prawns"},
-      {"name": "fenugreek seeds"},
-      {"name": "thin coconut milk"},
-      {"name": "thick coconut milk"},
-      {"name": "salt"}
-    ],
-    "description": "Lentils simmered with spices, coconut milk, and tempered aromatics"
-  }
+  "dish_name": "dhal_curry",
+  "aliases": [
+    "parippu",
+    "parippu_curry"
+  ],
+  "ingredients": [
+    {
+      "name": "channa dhal or yellow split peas"
+    },
+    {
+      "name": "oil"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "dried finger-length chillies"
+    },
+    {
+      "name": "pandanus leaf"
+    },
+    {
+      "name": "mustard seeds"
+    },
+    {
+      "name": "curry powder"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "Maldive fish or dried prawns"
+    },
+    {
+      "name": "fenugreek seeds"
+    },
+    {
+      "name": "thin coconut milk"
+    },
+    {
+      "name": "thick coconut milk"
+    },
+    {
+      "name": "salt"
+    }
+  ],
+  "description": "Lentils simmered with spices, coconut milk, and tempered aromatics"
+}

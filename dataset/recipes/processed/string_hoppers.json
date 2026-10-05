@@ -1,0 +1,16 @@
+{
+  "dish_name": "string hoppers",
+  "aliases": [],
+  "ingredients": [
+    {
+      "name": "rice flour"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "boiling water"
+    }
+  ],
+  "description": "Small, flat noodle patties made from a soft rice flour dough squeezed through a string hopper press and steamed until springy."
+}

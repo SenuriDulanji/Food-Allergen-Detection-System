@@ -58,7 +58,7 @@ class MLRiskReport(BaseModel):
     """Complete ML + Apriori risk prediction report for a scanned dish."""
     clinical_alerts: list[ClinicalAlert] = Field(
         default=[],
-        description="Per-ingredient risk predictions from the XGBoost SMOTE ML models.",
+        description="Per-ingredient risk predictions from the logistic regression models.",
     )
     safety_net_warnings: list[SafetyNetWarning] = Field(
         default=[],
@@ -98,7 +98,7 @@ class ScanResponse(BaseModel):
     # ML Risk Prediction (Layer 4 — ML + Apriori)
     ml_risk_report: MLRiskReport = Field(
         default_factory=MLRiskReport,
-        description="Clinical risk predictions from XGBoost models + Apriori cross-reactivity safety-net.",
+        description="Clinical risk predictions from   logistic regression models + Apriori cross-reactivity safety-net.",
     )
 
     # Optional debug/metadata

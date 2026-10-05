@@ -1,0 +1,49 @@
+{
+  "dish_name": "pork_curry",
+  "aliases": [],
+  "ingredients": [
+    {
+      "name": "oil"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "garlic"
+    },
+    {
+      "name": "fresh ginger"
+    },
+    {
+      "name": "lemongrass"
+    },
+    {
+      "name": "boneless pork"
+    },
+    {
+      "name": "dried tamarind pulp"
+    },
+    {
+      "name": "water"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "Roasted Curry Powder or meat curry powder"
+    },
+    {
+      "name": "crushed black peppercorns"
+    },
+    {
+      "name": "cloves"
+    },
+    {
+      "name": "cinnamon stick"
+    },
+    {
+      "name": "salt"
+    }
+  ],
+  "description": "Boneless pork simmered in a dark, thick, tangy gravy flavored with tamarind, roasted spices, and aromatics."
+}

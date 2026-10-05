@@ -185,8 +185,18 @@ async def scan_dish(
             "lactose_intolerance": 1.0 if user.lactose_intolerance else 0.0,
             "outside_food_frequency": float(user.outside_food_frequency or 0),
             "personal_allergy_history": 1.0 if user.personal_allergy_history else 0.0,
+            "work_env": user.work_env or "",
+            "family_has_history": 1.0 if user.family_has_history else 0.0,
+            "family_asthma": 1.0 if user.family_asthma else 0.0,
+            "family_eczema": 1.0 if user.family_eczema else 0.0,
         }
         
+        # Add family allergies list if present
+        if user.family_allergies:
+            user_profile["family_allergies"] = [
+                alg.strip() for alg in user.family_allergies.split(",") if alg.strip()
+            ]
+
         # Add medical conditions one-hot
         if user.medical_conditions:
             for cond in user.medical_conditions.split(","):

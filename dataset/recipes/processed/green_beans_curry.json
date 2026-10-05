@@ -1,0 +1,51 @@
+{
+  "dish_name": "green_beans_curry",
+  "aliases": [
+    "bonchi_curry"
+  ],
+  "ingredients": [
+    {
+      "name": "green beans"
+    },
+    {
+      "name": "oil"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "pandanus leaf"
+    },
+    {
+      "name": "curry leaves"
+    },
+    {
+      "name": "cinnamon stick"
+    },
+    {
+      "name": "green finger-length chillies"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "Roasted Curry Powder or regular curry powder"
+    },
+    {
+      "name": "ground black pepper"
+    },
+    {
+      "name": "thin coconut milk"
+    },
+    {
+      "name": "thick coconut milk"
+    },
+    {
+      "name": "lime juice"
+    },
+    {
+      "name": "salt"
+    }
+  ],
+  "description": "Deep-fried green beans simmered in a fragrant coconut milk gravy spiced with turmeric and curry powder."
+}

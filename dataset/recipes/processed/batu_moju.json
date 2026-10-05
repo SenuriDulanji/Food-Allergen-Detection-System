@@ -1,0 +1,42 @@
+{
+  "dish_name": "batu_moju",
+  "aliases": [
+    "wambatu_moju"
+  ],
+  "ingredients": [
+    {
+      "name": "oil"
+    },
+    {
+      "name": "Asian eggplants"
+    },
+    {
+      "name": "onion"
+    },
+    {
+      "name": "mustard seeds"
+    },
+    {
+      "name": "sugar"
+    },
+    {
+      "name": "turmeric powder"
+    },
+    {
+      "name": "vinegar"
+    },
+    {
+      "name": "green finger-length chillies"
+    },
+    {
+      "name": "dried prawns or Maldive fish"
+    },
+    {
+      "name": "salt"
+    },
+    {
+      "name": "pepper"
+    }
+  ],
+  "description": "A sweet, sour, and spicy Sri Lankan pickle made with deep-fried eggplant, vinegar, mustard, and spices."
+}

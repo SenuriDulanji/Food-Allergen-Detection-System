@@ -49,13 +49,33 @@ rules = association_rules(frequent_itemsets, metric="lift", min_threshold=2.0)
 # We prioritize Confidence (Predictive Accuracy) and then Support (Generalizability)
 correct_rules = rules.sort_values(by=['confidence', 'support'], ascending=[False, False])
 
-print("--- VALIDATED CROSS-REACTIVITY RULES ---")
+eval_dir = BASE_DIR / 'eval_results'
+eval_dir.mkdir(parents=True, exist_ok=True)
+csv_path = eval_dir / 'apriori_rules.csv'
+txt_path = eval_dir / 'apriori_summary.txt'
+
+# Save CSV (converting frozensets to strings for CSV compatibility)
+correct_rules_csv = correct_rules.copy()
+correct_rules_csv['antecedents'] = correct_rules_csv['antecedents'].apply(lambda x: ', '.join(list(x)))
+correct_rules_csv['consequents'] = correct_rules_csv['consequents'].apply(lambda x: ', '.join(list(x)))
+correct_rules_csv.to_csv(csv_path, index=False)
+
+output_lines = ["--- VALIDATED CROSS-REACTIVITY RULES ---"]
+print(output_lines[0])
+
 for index, row in correct_rules.iterrows():
     ant = list(row['antecedents'])[0].upper()
     cons = list(row['consequents'])[0].upper()
     
-    print(f"RULE: [ {ant} ] -> [ {cons} ]")
-    print(f"  Confidence : {row['confidence']*100:.1f}%")
-    print(f"  Lift       : {row['lift']:.2f} (Strength)")
-    print(f"  Support    : {row['support']*100:.1f}% of total population")
-    print("-" * 40)
+    chunk = (f"RULE: [ {ant} ] -> [ {cons} ]\n"
+             f"  Confidence : {row['confidence']*100:.1f}%\n"
+             f"  Lift       : {row['lift']:.2f} (Strength)\n"
+             f"  Support    : {row['support']*100:.1f}% of total population\n"
+             + "-" * 40)
+    print(chunk)
+    output_lines.append(chunk)
+
+with open(txt_path, 'w', encoding='utf-8') as f:
+    f.write("\n".join(output_lines) + "\n")
+
+print(f"\nResults saved to:\n- {csv_path}\n- {txt_path}")
