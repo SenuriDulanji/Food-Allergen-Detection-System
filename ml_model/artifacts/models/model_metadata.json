@@ -57,12 +57,21 @@
   "feature_selection_method": "Target-specific Spearman correlation (|rho| >= 0.15)",
   "threshold": 0.15,
   "models_trained_count": 24,
+  "primary_models_count": 17,
+  "exploratory_models_count": 7,
+  "tier_definition": {
+    "primary": "Targets with >= 5 positive cases (17 allergens, robust 5-fold CV support)",
+    "exploratory": "Targets with 2-4 positive cases (7 allergens, low sample prevalence, high-variance pilot indicators)",
+    "excluded": "Targets with < 2 positive cases (7 allergens, insufficient data to model)"
+  },
   "models": [
     {
       "allergen": "milk",
       "artifact_file": "risk_model_milk.joblib",
       "positive_cases": 13,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 9,
       "selected_features": [
         "gender",
@@ -81,6 +90,8 @@
       "artifact_file": "risk_model_eggs.joblib",
       "positive_cases": 3,
       "total_samples": 90,
+      "tier": "exploratory",
+      "tier_description": "Exploratory pilot model (2-4 cases, low sample prevalence; preliminary pilot signal)",
       "features_count": 7,
       "selected_features": [
         "med_cond_food_allergy",
@@ -97,6 +108,8 @@
       "artifact_file": "risk_model_peanuts.joblib",
       "positive_cases": 5,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 8,
       "selected_features": [
         "gender",
@@ -114,6 +127,8 @@
       "artifact_file": "risk_model_tree_nuts.joblib",
       "positive_cases": 6,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 10,
       "selected_features": [
         "lactose_intolerance",
@@ -133,6 +148,8 @@
       "artifact_file": "risk_model_wheat.joblib",
       "positive_cases": 5,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 10,
       "selected_features": [
         "gender",
@@ -152,6 +169,8 @@
       "artifact_file": "risk_model_soy.joblib",
       "positive_cases": 5,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 7,
       "selected_features": [
         "lactose_intolerance",
@@ -168,6 +187,8 @@
       "artifact_file": "risk_model_sesame.joblib",
       "positive_cases": 5,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 9,
       "selected_features": [
         "outside_food_frequency",
@@ -186,6 +207,8 @@
       "artifact_file": "risk_model_prawns.joblib",
       "positive_cases": 17,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 9,
       "selected_features": [
         "personal_allergy_history",
@@ -204,6 +227,8 @@
       "artifact_file": "risk_model_crab.joblib",
       "positive_cases": 18,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 12,
       "selected_features": [
         "age",
@@ -225,6 +250,8 @@
       "artifact_file": "risk_model_cuttlefish___squid.joblib",
       "positive_cases": 18,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 8,
       "selected_features": [
         "age",
@@ -242,6 +269,8 @@
       "artifact_file": "risk_model_dry_fish.joblib",
       "positive_cases": 4,
       "total_samples": 90,
+      "tier": "exploratory",
+      "tier_description": "Exploratory pilot model (2-4 cases, low sample prevalence; preliminary pilot signal)",
       "features_count": 8,
       "selected_features": [
         "age",
@@ -259,6 +288,8 @@
       "artifact_file": "risk_model_tuna.joblib",
       "positive_cases": 11,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 10,
       "selected_features": [
         "age",
@@ -278,6 +309,8 @@
       "artifact_file": "risk_model_beef.joblib",
       "positive_cases": 27,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 13,
       "selected_features": [
         "personal_allergy_history",
@@ -300,6 +333,8 @@
       "artifact_file": "risk_model_pork.joblib",
       "positive_cases": 31,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 16,
       "selected_features": [
         "personal_allergy_history",
@@ -325,6 +360,8 @@
       "artifact_file": "risk_model_mutton.joblib",
       "positive_cases": 18,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 12,
       "selected_features": [
         "personal_allergy_history",
@@ -346,6 +383,8 @@
       "artifact_file": "risk_model_coconut.joblib",
       "positive_cases": 2,
       "total_samples": 90,
+      "tier": "exploratory",
+      "tier_description": "Exploratory pilot model (2-4 cases, low sample prevalence; preliminary pilot signal)",
       "features_count": 7,
       "selected_features": [
         "lactose_intolerance",
@@ -362,6 +401,8 @@
       "artifact_file": "risk_model_spicy_oily.joblib",
       "positive_cases": 18,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 7,
       "selected_features": [
         "age",
@@ -378,6 +419,8 @@
       "artifact_file": "risk_model_jackfruit.joblib",
       "positive_cases": 2,
       "total_samples": 90,
+      "tier": "exploratory",
+      "tier_description": "Exploratory pilot model (2-4 cases, low sample prevalence; preliminary pilot signal)",
       "features_count": 4,
       "selected_features": [
         "lactose_intolerance",
@@ -391,6 +434,8 @@
       "artifact_file": "risk_model_pineapple.joblib",
       "positive_cases": 13,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 14,
       "selected_features": [
         "personal_allergy_history",
@@ -414,6 +459,8 @@
       "artifact_file": "risk_model_tomato.joblib",
       "positive_cases": 4,
       "total_samples": 90,
+      "tier": "exploratory",
+      "tier_description": "Exploratory pilot model (2-4 cases, low sample prevalence; preliminary pilot signal)",
       "features_count": 7,
       "selected_features": [
         "age",
@@ -430,6 +477,8 @@
       "artifact_file": "risk_model_rambutan.joblib",
       "positive_cases": 6,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 10,
       "selected_features": [
         "personal_allergy_history",
@@ -449,6 +498,8 @@
       "artifact_file": "risk_model_mustard.joblib",
       "positive_cases": 4,
       "total_samples": 90,
+      "tier": "exploratory",
+      "tier_description": "Exploratory pilot model (2-4 cases, low sample prevalence; preliminary pilot signal)",
       "features_count": 7,
       "selected_features": [
         "personal_allergy_history",
@@ -465,6 +516,8 @@
       "artifact_file": "risk_model_fenugreek.joblib",
       "positive_cases": 2,
       "total_samples": 90,
+      "tier": "exploratory",
+      "tier_description": "Exploratory pilot model (2-4 cases, low sample prevalence; preliminary pilot signal)",
       "features_count": 6,
       "selected_features": [
         "personal_allergy_history",
@@ -480,6 +533,8 @@
       "artifact_file": "risk_model_cumin.joblib",
       "positive_cases": 6,
       "total_samples": 90,
+      "tier": "primary",
+      "tier_description": "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)",
       "features_count": 7,
       "selected_features": [
         "lactose_intolerance",

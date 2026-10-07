@@ -50,6 +50,15 @@ SAFETY_RULES: dict[str, list[str]] = {
 }
 
 # --------------------------------------------------------------------------- #
+#  Model Tier Index (Primary >= 5 cases vs. Exploratory 2-4 cases)             #
+# --------------------------------------------------------------------------- #
+# High-variance targets with 2-4 positive survey cases are designated as
+# exploratory pilot models and carry explicit clinical disclaimers.
+EXPLORATORY_MODEL_KEYS: set[str] = {
+    "eggs", "dry_fish", "coconut", "jackfruit", "tomato", "mustard", "fenugreek"
+}
+
+# --------------------------------------------------------------------------- #
 #  Ingredient synonym normalisation                                            #
 # --------------------------------------------------------------------------- #
 # Maps common aliases / regional names → the canonical key used in model files
@@ -678,6 +687,7 @@ def predict_dish_safety(
             {
               "ingredient": str,            # raw ingredient name
               "model_key": str,             # sanitised model file-stem
+              "tier": str,                  # 'primary' (>= 5 cases) or 'exploratory' (2-4 cases)
               "risk_flag": int,             # 0 = negative, 1 = heightened sensitivity risk
               "risk_level": int,            # binary 0/1 flag (retained for backward compatibility)
               "risk_probability": str,      # predicted positive-class probability (e.g. '72.4%')
@@ -757,19 +767,33 @@ def predict_dish_safety(
                 except Exception:
                     confidence_pct = "N/A"
 
+                is_exploratory = resolved_key in EXPLORATORY_MODEL_KEYS
+                tier = "exploratory" if is_exploratory else "primary"
+
+                if is_exploratory:
+                    msg = (
+                        f"⚠️ Exploratory sensitivity indicator for '{ingredient}' "
+                        f"(resolved → '{resolved_key}', estimated risk probability: {confidence_pct}). "
+                        "Note: Model trained on preliminary pilot data with low survey prevalence (2–4 cases); "
+                        "interpret as an exploratory pilot signal, not a clinically validated predictor."
+                    )
+                else:
+                    msg = (
+                        f"⚠️ Heightened sensitivity risk detected for '{ingredient}' "
+                        f"(resolved → '{resolved_key}', estimated risk probability: {confidence_pct}). "
+                        "Your self-reported profile indicates a statistical risk (pilot indicator, not a clinical allergy diagnosis)."
+                    )
+
                 full_report["clinical_alerts"].append({
                     "ingredient": ingredient,
                     "model_key": resolved_key,
+                    "tier": tier,
                     "risk_flag": risk_pred,
                     "risk_level": risk_pred,
                     "risk_probability": confidence_pct,
                     "predicted_probability": confidence_pct,
                     "confidence": confidence_pct,
-                    "msg": (
-                        f"⚠️ Heightened sensitivity risk detected for '{ingredient}' "
-                        f"(resolved → '{resolved_key}', estimated risk probability: {confidence_pct}). "
-                        "Your self-reported profile indicates a statistical risk (pilot indicator, not a clinical allergy diagnosis)."
-                    ),
+                    "msg": msg,
                 })
                 logger.info(
                     "ML model flagged '%s' (key='%s') | risk=%d | probability=%s",

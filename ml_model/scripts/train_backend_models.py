@@ -113,18 +113,29 @@ for target_food in identified_allergens:
         joblib.dump(model, file_path)
         
         success_count += 1
+        tier = "primary" if positive_cases >= 5 else "exploratory"
+        tier_desc = (
+            "Primary cohort model (>= 5 cases, evaluated via 5-fold CV)"
+            if positive_cases >= 5
+            else "Exploratory pilot model (2-4 cases, low sample prevalence; preliminary pilot signal)"
+        )
         trained_metadata.append({
             "allergen": target_food,
             "artifact_file": file_path.name,
             "positive_cases": positive_cases,
             "total_samples": len(df),
+            "tier": tier,
+            "tier_description": tier_desc,
             "features_count": len(features_to_keep),
             "selected_features": features_to_keep
         })
-        print(f"✅ Trained & Saved: {target_food.upper():20s} (Cases: {positive_cases:2d}/{len(df)}, Features: {len(features_to_keep):2d}) -> {file_path.name}")
+        print(f"✅ Trained & Saved: {target_food.upper():20s} [{tier.upper():11s}] (Cases: {positive_cases:2d}/{len(df)}, Features: {len(features_to_keep):2d}) -> {file_path.name}")
         
     except Exception as e:
         print(f"❌ Failed to train {target_food.upper()}: {e}")
+
+primary_count = sum(1 for m in trained_metadata if m["tier"] == "primary")
+exploratory_count = sum(1 for m in trained_metadata if m["tier"] == "exploratory")
 
 # Save metadata json for downstream service transparency
 metadata_path = ARTIFACTS_DIR / "model_metadata.json"
@@ -135,6 +146,13 @@ metadata_content = {
     "feature_selection_method": "Target-specific Spearman correlation (|rho| >= 0.15)",
     "threshold": THRESHOLD,
     "models_trained_count": success_count,
+    "primary_models_count": primary_count,
+    "exploratory_models_count": exploratory_count,
+    "tier_definition": {
+        "primary": "Targets with >= 5 positive cases (17 allergens, robust 5-fold CV support)",
+        "exploratory": "Targets with 2-4 positive cases (7 allergens, low sample prevalence, high-variance pilot indicators)",
+        "excluded": "Targets with < 2 positive cases (7 allergens, insufficient data to model)"
+    },
     "models": trained_metadata
 }
 with open(metadata_path, 'w', encoding='utf-8') as f:
