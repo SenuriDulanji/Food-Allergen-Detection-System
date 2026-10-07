@@ -69,7 +69,6 @@ INGREDIENT_SYNONYMS: dict[str, str] = {
     "coconut butter":       "coconut",
     "soy milk":             "soy",       # contains 'milk' → would hit milk
     "soya milk":            "soy",
-    "oat milk":             "wheat",     # contains 'milk' → would hit milk
     "almond milk":          "tree_nuts", # contains 'milk' → would hit milk
     "tuna steak":           "tuna",      # contains 'steak' → would hit beef
     "tuna fish":            "tuna",
@@ -91,14 +90,12 @@ INGREDIENT_SYNONYMS: dict[str, str] = {
     "king prawn":           "prawns",
     "tiger prawn":          "prawns",
     "jumbo prawn":          "prawns",
-    "lobster":              "prawns",       # crustacean cross-reactivity
 
     # ── Cuttlefish / Squid ───────────────────────────────────────────────
     "squid":                "cuttlefish / squid",
     "cuttlefish":           "cuttlefish / squid",
     "calamari":             "cuttlefish / squid",
     "inkfish":              "cuttlefish / squid",
-    "octopus":              "cuttlefish / squid",
 
     # ── Milk / Dairy ─────────────────────────────────────────────────────
     # Compound phrases that would otherwise partially match a shorter key
@@ -241,7 +238,6 @@ INGREDIENT_SYNONYMS: dict[str, str] = {
     "lamb":                 "mutton",
     "goat":                 "mutton",
     "goat meat":            "mutton",
-    "venison":              "mutton",      # red meat cross-reactivity
 }
 
 
@@ -265,12 +261,16 @@ BASE_FEATURE_COLS: list[str] = [
     "med_cond_none_of_these",
     "med_cond_not_sure",
     "family_has_history",
+    "family_asthma",
+    "family_eczema",
     "family_allergy_beef",
     "family_allergy_pork",
     "family_allergy_sausage",
     "family_allergy_red_meat",
     "family_allergy_seafood",
     "family_allergy_dairy",
+    "family_allergy_nuts",
+    "family_allergy_egg",
     "family_allergy_tomato",
     "family_allergy_pineapple",
     "family_allergy_avocado",
@@ -278,20 +278,24 @@ BASE_FEATURE_COLS: list[str] = [
     "family_allergy_flour",
 ]
 
-# Province one-hot prefixes matching exactly fit feature names
+# Province one-hot prefixes matching exactly fit feature names (all 7 provinces represented)
 _PROVINCE_COLS = [
     "province_Central Province", 
+    "province_North Central Province",
     "province_North Western Province", 
     "province_Sabaragamuwa Province", 
+    "province_Southern Province",
     "province_Uva Province", 
     "province_Western Province"
 ]
-# Blood-type one-hot prefixes matching exactly fit feature names
+# Blood-type one-hot prefixes matching exactly fit feature names (all 9 blood type categories)
 _BLOOD_TYPE_COLS = [
     "blood_type_A+", 
     "blood_type_A-", 
     "blood_type_AB+", 
+    "blood_type_AB-",
     "blood_type_B+", 
+    "blood_type_B-",
     "blood_type_I don't know / Not sure", 
     "blood_type_O+", 
     "blood_type_O-"
@@ -467,8 +471,8 @@ def build_feature_vector(user_profile: dict[str, Any]) -> pd.DataFrame:
     match the feature set used at training time.
 
     The caller passes a dict with *any subset* of the known keys.  Missing
-    values default to 0 (safe / unknown), which causes the model to predict
-    the population-average baseline — a conservative, safe fallback.
+    values default to 0 (absence of condition / exposure), which causes the model
+    to evaluate risk against the non-reactive baseline profile.
 
     Args:
         user_profile: Dict containing demographic and medical data.
@@ -522,18 +526,35 @@ def build_feature_vector(user_profile: dict[str, Any]) -> pd.DataFrame:
 
     # ── convenience one-hot expanders ──────────────────────────────────── #
     if "province" in user_profile and user_profile["province"]:
-        prov_val = user_profile["province"].strip().lower()
+        prov_val = user_profile["province"].strip().lower().replace("province", "").strip()
+        matched_prov = None
         for col in _PROVINCE_COLS:
-            if prov_val in col.lower():
-                row[col] = 1.0
+            core = col.lower().replace("province_", "").replace("province", "").strip()
+            if prov_val == core:
+                matched_prov = col
                 break
+        if not matched_prov:
+            for col in sorted(_PROVINCE_COLS, key=lambda c: len(c), reverse=True):
+                core = col.lower().replace("province_", "").replace("province", "").strip()
+                if prov_val in core or core in prov_val:
+                    matched_prov = col
+                    break
+        if matched_prov:
+            row[matched_prov] = 1.0
 
     if "blood_type" in user_profile and user_profile["blood_type"]:
         bt_val = user_profile["blood_type"].strip().lower()
+        matched_bt = None
         for col in _BLOOD_TYPE_COLS:
-            if bt_val in col.lower() or (bt_val in ["not sure", "don't know", "i don't know / not sure"] and "i don't know" in col.lower()):
-                row[col] = 1.0
+            core = col.lower().replace("blood_type_", "").strip()
+            if bt_val == core:
+                matched_bt = col
                 break
+            if bt_val in ["not sure", "don't know", "i don't know / not sure", "unknown"] and "i don't know" in core:
+                matched_bt = col
+                break
+        if matched_bt:
+            row[matched_bt] = 1.0
 
     if "dietary_pattern" in user_profile and user_profile["dietary_pattern"]:
         dp_val = user_profile["dietary_pattern"].strip().lower()
@@ -552,11 +573,23 @@ def build_feature_vector(user_profile: dict[str, Any]) -> pd.DataFrame:
                 row[col] = 1.0
                 break
 
+    if "family_conditions" in user_profile and user_profile["family_conditions"]:
+        for cond in user_profile["family_conditions"]:
+            fc_key = f"family_{cond.strip().lower()}"
+            if fc_key in row:
+                row[fc_key] = 1.0
+
     if "family_allergies" in user_profile and user_profile["family_allergies"]:
         for alg in user_profile["family_allergies"]:
-            fa_key = f"family_allergy_{alg.strip().lower()}"
-            if fa_key in row:
-                row[fa_key] = 1.0
+            a = alg.strip().lower()
+            if a in ("egg", "eggs"):
+                row["family_allergy_egg"] = 1.0
+            elif a in ("nuts", "nut", "tree_nuts"):
+                row["family_allergy_nuts"] = 1.0
+            else:
+                fa_key = f"family_allergy_{a}"
+                if fa_key in row:
+                    row[fa_key] = 1.0
 
     # Preserve any pre-expanded one-hot columns already in user_profile
     for col in ALL_POSSIBLE_FEATURES:
@@ -585,15 +618,19 @@ def predict_dish_safety(
                               the dish by the vision + RAG pipeline.
         user_profile:         Dict of user demographic / medical features.
                               Pass None or {} to run with zero-vector
-                              (population-average predictions).
+                              (baseline profile without reported conditions/exposures).
 
     Returns:
         {
           "clinical_alerts": [
             {
-              "ingredient": str,      # raw ingredient name
-              "model_key": str,       # sanitised file-stem
-              "risk_level": int,      # 1 = low, 2 = medium, 3 = high
+              "ingredient": str,            # raw ingredient name
+              "model_key": str,             # sanitised model file-stem
+              "risk_flag": int,             # 0 = negative, 1 = heightened sensitivity risk
+              "risk_level": int,            # binary 0/1 flag (retained for backward compatibility)
+              "risk_probability": str,      # predicted positive-class probability (e.g. '72.4%')
+              "predicted_probability": str, # alias for risk_probability
+              "confidence": str,            # alias for risk_probability (retained for backward compatibility)
               "msg": str
             }, ...
           ],
@@ -660,16 +697,19 @@ def predict_dish_safety(
                 full_report["clinical_alerts"].append({
                     "ingredient": ingredient,
                     "model_key": resolved_key,
+                    "risk_flag": risk_pred,
                     "risk_level": risk_pred,
+                    "risk_probability": confidence_pct,
+                    "predicted_probability": confidence_pct,
                     "confidence": confidence_pct,
                     "msg": (
                         f"⚠️ Heightened sensitivity risk detected for '{ingredient}' "
-                        f"(resolved → '{resolved_key}', confidence: {confidence_pct}). "
+                        f"(resolved → '{resolved_key}', estimated risk probability: {confidence_pct}). "
                         "Your self-reported profile indicates a statistical risk (pilot indicator, not a clinical allergy diagnosis)."
                     ),
                 })
                 logger.info(
-                    "ML model flagged '%s' (key='%s') | risk=%d | confidence=%s",
+                    "ML model flagged '%s' (key='%s') | risk=%d | probability=%s",
                     ingredient, resolved_key, risk_pred, confidence_pct,
                 )
         except Exception as exc:
@@ -678,7 +718,7 @@ def predict_dish_safety(
                 ingredient, resolved_key, exc, exc_info=True,
             )
 
-    # ── Apriori Safety Net — Cross-reactivity Warnings ────────────────── #
+    # ── Apriori Safety Net — Association Warnings ──────────────────────── #
     seen_rule_keys: set[str] = set()
 
     for ingredient in detected_ingredients:
@@ -695,9 +735,10 @@ def predict_dish_safety(
             "trigger": ingredient,
             "linked_risks": linked,
             "msg": (
-                f"🔗 Cross-reactivity alert: '{ingredient}' "
-                f"(identified as '{rule_key}') is biologically associated "
-                f"with {', '.join(linked)}. Individuals reactive to one may react to others."
+                f"🔗 Association-based safety warning: '{ingredient}' "
+                f"(identified as '{rule_key}') frequently co-occurred in survey responses with {', '.join(linked)}. "
+                "Individuals reporting sensitivity to one frequently reported reactions to the other. "
+                "(Survey statistical association; does not establish biological cross-reactivity.)"
             ),
         })
         logger.info(

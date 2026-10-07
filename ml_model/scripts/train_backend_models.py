@@ -60,32 +60,15 @@ feature_cols += [col for col in df.columns if col.startswith('work_env_')]
 print(f"Total candidate features: {len(feature_cols)}")
 
 # ==========================================
-# 3. FEATURE SELECTION (FULL DATASET FOR PRODUCTION)
+# 3. TARGET-SPECIFIC TRAINING & ARTIFACT SAVING LOOP
 # ==========================================
-# Note: For experimental evaluation without data leakage, see evaluate_models.py
-# which performs feature selection strictly inside 5-fold cross-validation folds.
-# For production deployment, models are trained on the full dataset to maximize statistical power.
-full_corr = df[feature_cols + identified_allergens].corr(method='spearman')
-feature_target_corr = full_corr.loc[feature_cols, identified_allergens]
-max_correlations = feature_target_corr.abs().max(axis=1).fillna(0)
+print("\n🚀 STARTING TARGET-SPECIFIC MASS TRAINING FOR ALL 24 ALLERGENS (FULL DATASET)...\n")
 
 THRESHOLD = 0.15
-features_to_keep = max_correlations[max_correlations >= THRESHOLD].index.tolist()
-features_to_drop = max_correlations[max_correlations < THRESHOLD].index.tolist()
-
-print(f"Features selected (max |corr| >= {THRESHOLD}): {len(features_to_keep)} kept, {len(features_to_drop)} dropped")
-print(f"Dropped features: {features_to_drop}")
-
-X = df[features_to_keep]
-y = df[identified_allergens]
-
-# ==========================================
-# 4. MASS TRAINING & ARTIFACT SAVING LOOP
-# ==========================================
-print("\n🚀 STARTING MASS TRAINING FOR ALL 24 ALLERGENS (FULL DATASET FOR PRODUCTION)...\n")
-
 success_count = 0
 trained_metadata = []
+
+y = df[identified_allergens]
 
 for target_food in identified_allergens:
     # Binarize the target: 1 if > 0 (Risk), 0 if 0 (Safe)
@@ -96,14 +79,23 @@ for target_food in identified_allergens:
     if positive_cases < 2:
         print(f"⏭️ Skipping {target_food.upper()}: Only {positive_cases} case(s). Insufficient data to train.")
         continue
+    
+    # Target-specific feature selection: correlate strictly with this target
+    corr = df[feature_cols + [target_food]].corr(method='spearman')
+    feature_corr = corr.loc[feature_cols, target_food].abs().fillna(0)
+    features_to_keep = feature_corr[feature_corr >= THRESHOLD].index.tolist()
+    if len(features_to_keep) < 2:
+        features_to_keep = feature_corr.nlargest(3).index.tolist()
         
+    X_target = df[features_to_keep]
+    
     # Logistic Regression with balanced class weights selected for clinical interpretability,
     # transparent odds ratios, and deterministic low-latency edge inference
     model = LogisticRegression(class_weight='balanced', max_iter=500, random_state=42)
     
     # Train and Save on full dataset
     try:
-        model.fit(X, y_single_target)
+        model.fit(X_target, y_single_target)
         
         # Clean the food name for filename
         clean_name = target_food.lower().replace(' ', '_').replace('/', '_')
@@ -118,9 +110,10 @@ for target_food in identified_allergens:
             "artifact_file": file_path.name,
             "positive_cases": positive_cases,
             "total_samples": len(df),
-            "features_count": len(features_to_keep)
+            "features_count": len(features_to_keep),
+            "selected_features": features_to_keep
         })
-        print(f"✅ Trained & Saved: {target_food.upper()} (Cases: {positive_cases}/{len(df)}) -> {file_path.name}")
+        print(f"✅ Trained & Saved: {target_food.upper():20s} (Cases: {positive_cases:2d}/{len(df)}, Features: {len(features_to_keep):2d}) -> {file_path.name}")
         
     except Exception as e:
         print(f"❌ Failed to train {target_food.upper()}: {e}")
@@ -129,15 +122,24 @@ for target_food in identified_allergens:
 metadata_path = ARTIFACTS_DIR / "model_metadata.json"
 metadata_content = {
     "total_training_samples": len(df),
-    "features_count": len(features_to_keep),
-    "selected_features": features_to_keep,
-    "dropped_features": features_to_drop,
+    "candidate_features_count": len(feature_cols),
+    "feature_selection_method": "Target-specific Spearman correlation (|rho| >= 0.15)",
     "threshold": THRESHOLD,
     "models_trained_count": success_count,
     "models": trained_metadata
 }
 with open(metadata_path, 'w', encoding='utf-8') as f:
     json.dump(metadata_content, f, indent=2)
+
+# Save scaler reference parameters (min and max age) for inference transparency
+scaler_info = {
+    "feature": "age",
+    "min_age": 14.0,
+    "max_age": 82.0,
+    "scale_range": 68.0
+}
+with open(ARTIFACTS_DIR / "scaler_params.json", 'w', encoding='utf-8') as f:
+    json.dump(scaler_info, f, indent=2)
 
 print(f"\n🎉 TRAINING COMPLETE! Successfully saved {success_count} model artifacts to {ARTIFACTS_DIR}.")
 print(f"Model metadata written to: {metadata_path}")

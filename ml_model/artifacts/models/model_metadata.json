@@ -1,61 +1,7 @@
 {
   "total_training_samples": 90,
-  "features_count": 43,
-  "selected_features": [
-    "age",
-    "gender",
-    "personal_allergy_history",
-    "outside_food_frequency",
-    "lactose_intolerance",
-    "med_cond_asthma",
-    "med_cond_eczema",
-    "med_cond_food_allergy",
-    "med_cond_none_of_these",
-    "med_cond_not_sure",
-    "family_has_history",
-    "family_allergy_beef",
-    "family_allergy_pork",
-    "family_allergy_sausage",
-    "family_allergy_red_meat",
-    "family_allergy_seafood",
-    "family_allergy_dairy",
-    "family_allergy_tomato",
-    "family_allergy_pineapple",
-    "family_allergy_avocado",
-    "family_allergy_breadfruit",
-    "family_allergy_flour",
-    "province_Central Province",
-    "province_North Western Province",
-    "province_Sabaragamuwa Province",
-    "province_Uva Province",
-    "province_Western Province",
-    "blood_type_A+",
-    "blood_type_A-",
-    "blood_type_AB+",
-    "blood_type_B+",
-    "blood_type_I don't know / Not sure",
-    "blood_type_O+",
-    "blood_type_O-",
-    "dietary_pattern_Omnivore (Eats everything)",
-    "dietary_pattern_Vegetarian (Eats dairy/eggs, no meat)",
-    "work_env_agricultural_or_plant_materials",
-    "work_env_chemicals_or_strong_fumes",
-    "work_env_continuous_air_conditioning",
-    "work_env_dust_or_strong_pollutants",
-    "work_env_extreme_heat_or_direct_sunlight",
-    "work_env_none_of_the_above",
-    "work_env_standard_home_environment_work_from_home___remote"
-  ],
-  "dropped_features": [
-    "family_asthma",
-    "family_eczema",
-    "family_allergy_nuts",
-    "family_allergy_egg",
-    "province_North Central Province",
-    "province_Southern Province",
-    "blood_type_AB-",
-    "blood_type_B-"
-  ],
+  "candidate_features_count": 51,
+  "feature_selection_method": "Target-specific Spearman correlation (|rho| >= 0.15)",
   "threshold": 0.15,
   "models_trained_count": 24,
   "models": [
@@ -64,168 +10,433 @@
       "artifact_file": "risk_model_milk.joblib",
       "positive_cases": 13,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 9,
+      "selected_features": [
+        "gender",
+        "personal_allergy_history",
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "family_has_history",
+        "family_allergy_dairy",
+        "blood_type_I don't know / Not sure",
+        "work_env_chemicals_or_strong_fumes"
+      ]
     },
     {
       "allergen": "eggs",
       "artifact_file": "risk_model_eggs.joblib",
       "positive_cases": 3,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 7,
+      "selected_features": [
+        "med_cond_food_allergy",
+        "blood_type_AB+",
+        "dietary_pattern_Omnivore (Eats everything)",
+        "dietary_pattern_Vegetarian (Eats dairy/eggs, no meat)",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_continuous_air_conditioning",
+        "work_env_standard_home_environment_work_from_home___remote"
+      ]
     },
     {
       "allergen": "peanuts",
       "artifact_file": "risk_model_peanuts.joblib",
       "positive_cases": 5,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 8,
+      "selected_features": [
+        "gender",
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "family_allergy_dairy",
+        "province_Uva Province",
+        "blood_type_AB+",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_chemicals_or_strong_fumes"
+      ]
     },
     {
       "allergen": "tree_nuts",
       "artifact_file": "risk_model_tree_nuts.joblib",
       "positive_cases": 6,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 10,
+      "selected_features": [
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "family_allergy_dairy",
+        "province_North Western Province",
+        "province_Uva Province",
+        "blood_type_AB+",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_chemicals_or_strong_fumes",
+        "work_env_continuous_air_conditioning",
+        "work_env_standard_home_environment_work_from_home___remote"
+      ]
     },
     {
       "allergen": "wheat",
       "artifact_file": "risk_model_wheat.joblib",
       "positive_cases": 5,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 10,
+      "selected_features": [
+        "gender",
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "blood_type_A+",
+        "blood_type_AB+",
+        "blood_type_O+",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_dust_or_strong_pollutants",
+        "work_env_standard_home_environment_work_from_home___remote"
+      ]
     },
     {
       "allergen": "soy",
       "artifact_file": "risk_model_soy.joblib",
       "positive_cases": 5,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 7,
+      "selected_features": [
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "province_Sabaragamuwa Province",
+        "blood_type_AB+",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_standard_home_environment_work_from_home___remote"
+      ]
     },
     {
       "allergen": "sesame",
       "artifact_file": "risk_model_sesame.joblib",
       "positive_cases": 5,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 9,
+      "selected_features": [
+        "outside_food_frequency",
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "family_allergy_dairy",
+        "province_Uva Province",
+        "blood_type_AB+",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_chemicals_or_strong_fumes",
+        "work_env_standard_home_environment_work_from_home___remote"
+      ]
     },
     {
       "allergen": "prawns",
       "artifact_file": "risk_model_prawns.joblib",
       "positive_cases": 17,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 9,
+      "selected_features": [
+        "personal_allergy_history",
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "family_allergy_sausage",
+        "family_allergy_flour",
+        "province_Uva Province",
+        "blood_type_A+",
+        "work_env_chemicals_or_strong_fumes"
+      ]
     },
     {
       "allergen": "crab",
       "artifact_file": "risk_model_crab.joblib",
       "positive_cases": 18,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 12,
+      "selected_features": [
+        "age",
+        "personal_allergy_history",
+        "lactose_intolerance",
+        "med_cond_asthma",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "family_has_history",
+        "family_allergy_red_meat",
+        "blood_type_A+",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_chemicals_or_strong_fumes",
+        "work_env_extreme_heat_or_direct_sunlight"
+      ]
     },
     {
       "allergen": "cuttlefish / squid",
       "artifact_file": "risk_model_cuttlefish___squid.joblib",
       "positive_cases": 18,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 8,
+      "selected_features": [
+        "age",
+        "personal_allergy_history",
+        "med_cond_asthma",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "blood_type_A+",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_chemicals_or_strong_fumes"
+      ]
     },
     {
       "allergen": "dry_fish",
       "artifact_file": "risk_model_dry_fish.joblib",
       "positive_cases": 4,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 8,
+      "selected_features": [
+        "age",
+        "personal_allergy_history",
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "family_allergy_dairy",
+        "province_Uva Province",
+        "work_env_chemicals_or_strong_fumes"
+      ]
     },
     {
       "allergen": "tuna",
       "artifact_file": "risk_model_tuna.joblib",
       "positive_cases": 11,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 10,
+      "selected_features": [
+        "age",
+        "personal_allergy_history",
+        "med_cond_asthma",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "med_cond_not_sure",
+        "family_allergy_sausage",
+        "family_allergy_seafood",
+        "family_allergy_dairy",
+        "work_env_chemicals_or_strong_fumes"
+      ]
     },
     {
       "allergen": "beef",
       "artifact_file": "risk_model_beef.joblib",
       "positive_cases": 27,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 13,
+      "selected_features": [
+        "personal_allergy_history",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "family_allergy_beef",
+        "family_allergy_pork",
+        "family_allergy_red_meat",
+        "family_allergy_dairy",
+        "family_allergy_pineapple",
+        "family_allergy_flour",
+        "province_North Western Province",
+        "province_Western Province",
+        "dietary_pattern_Omnivore (Eats everything)",
+        "dietary_pattern_Vegetarian (Eats dairy/eggs, no meat)"
+      ]
     },
     {
       "allergen": "pork",
       "artifact_file": "risk_model_pork.joblib",
       "positive_cases": 31,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 16,
+      "selected_features": [
+        "personal_allergy_history",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "family_allergy_pork",
+        "family_allergy_dairy",
+        "family_allergy_tomato",
+        "family_allergy_pineapple",
+        "province_North Western Province",
+        "province_Uva Province",
+        "province_Western Province",
+        "blood_type_A+",
+        "dietary_pattern_Omnivore (Eats everything)",
+        "dietary_pattern_Vegetarian (Eats dairy/eggs, no meat)",
+        "work_env_dust_or_strong_pollutants",
+        "work_env_none_of_the_above",
+        "work_env_standard_home_environment_work_from_home___remote"
+      ]
     },
     {
       "allergen": "mutton",
       "artifact_file": "risk_model_mutton.joblib",
       "positive_cases": 18,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 12,
+      "selected_features": [
+        "personal_allergy_history",
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "med_cond_not_sure",
+        "family_has_history",
+        "province_North Western Province",
+        "blood_type_A-",
+        "dietary_pattern_Omnivore (Eats everything)",
+        "dietary_pattern_Vegetarian (Eats dairy/eggs, no meat)",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_dust_or_strong_pollutants"
+      ]
     },
     {
       "allergen": "coconut",
       "artifact_file": "risk_model_coconut.joblib",
       "positive_cases": 2,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 7,
+      "selected_features": [
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "dietary_pattern_Omnivore (Eats everything)",
+        "dietary_pattern_Vegetarian (Eats dairy/eggs, no meat)",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_standard_home_environment_work_from_home___remote"
+      ]
     },
     {
       "allergen": "spicy_oily",
       "artifact_file": "risk_model_spicy_oily.joblib",
       "positive_cases": 18,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 7,
+      "selected_features": [
+        "age",
+        "gender",
+        "med_cond_food_allergy",
+        "family_allergy_beef",
+        "family_allergy_flour",
+        "work_env_chemicals_or_strong_fumes",
+        "work_env_extreme_heat_or_direct_sunlight"
+      ]
     },
     {
       "allergen": "jackfruit",
       "artifact_file": "risk_model_jackfruit.joblib",
       "positive_cases": 2,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 4,
+      "selected_features": [
+        "lactose_intolerance",
+        "work_env_dust_or_strong_pollutants",
+        "work_env_extreme_heat_or_direct_sunlight",
+        "work_env_standard_home_environment_work_from_home___remote"
+      ]
     },
     {
       "allergen": "pineapple",
       "artifact_file": "risk_model_pineapple.joblib",
       "positive_cases": 13,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 14,
+      "selected_features": [
+        "personal_allergy_history",
+        "lactose_intolerance",
+        "med_cond_eczema",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "family_has_history",
+        "family_allergy_dairy",
+        "family_allergy_pineapple",
+        "family_allergy_flour",
+        "blood_type_I don't know / Not sure",
+        "blood_type_O-",
+        "work_env_chemicals_or_strong_fumes",
+        "work_env_dust_or_strong_pollutants",
+        "work_env_extreme_heat_or_direct_sunlight"
+      ]
     },
     {
       "allergen": "tomato",
       "artifact_file": "risk_model_tomato.joblib",
       "positive_cases": 4,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 7,
+      "selected_features": [
+        "age",
+        "personal_allergy_history",
+        "outside_food_frequency",
+        "med_cond_asthma",
+        "family_allergy_dairy",
+        "province_Uva Province",
+        "work_env_chemicals_or_strong_fumes"
+      ]
     },
     {
       "allergen": "rambutan",
       "artifact_file": "risk_model_rambutan.joblib",
       "positive_cases": 6,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 10,
+      "selected_features": [
+        "personal_allergy_history",
+        "outside_food_frequency",
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "family_has_history",
+        "blood_type_A+",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_dust_or_strong_pollutants",
+        "work_env_extreme_heat_or_direct_sunlight"
+      ]
     },
     {
       "allergen": "mustard",
       "artifact_file": "risk_model_mustard.joblib",
       "positive_cases": 4,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 7,
+      "selected_features": [
+        "personal_allergy_history",
+        "lactose_intolerance",
+        "family_allergy_dairy",
+        "province_Uva Province",
+        "blood_type_A-",
+        "work_env_chemicals_or_strong_fumes",
+        "work_env_continuous_air_conditioning"
+      ]
     },
     {
       "allergen": "fenugreek",
       "artifact_file": "risk_model_fenugreek.joblib",
       "positive_cases": 2,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 6,
+      "selected_features": [
+        "personal_allergy_history",
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "province_Central Province",
+        "work_env_dust_or_strong_pollutants"
+      ]
     },
     {
       "allergen": "cumin",
       "artifact_file": "risk_model_cumin.joblib",
       "positive_cases": 6,
       "total_samples": 90,
-      "features_count": 43
+      "features_count": 7,
+      "selected_features": [
+        "lactose_intolerance",
+        "med_cond_food_allergy",
+        "med_cond_none_of_these",
+        "province_Uva Province",
+        "blood_type_A+",
+        "work_env_agricultural_or_plant_materials",
+        "work_env_dust_or_strong_pollutants"
+      ]
     }
   ]
 }

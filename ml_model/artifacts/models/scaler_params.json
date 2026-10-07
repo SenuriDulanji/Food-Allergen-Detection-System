@@ -1,0 +1,6 @@
+{
+  "feature": "age",
+  "min_age": 14.0,
+  "max_age": 82.0,
+  "scale_range": 68.0
+}
