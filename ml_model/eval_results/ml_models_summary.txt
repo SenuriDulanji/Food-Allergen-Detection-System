@@ -3,22 +3,22 @@ Methodology: Stratified Cross-Validation with Strict In-Fold Preprocessing & Tar
 
 === PRIMARY SUBSET PERFORMANCE (17 ALLERGENS WITH >= 5 CASES, 5-FOLD CV) ===
 Note: Each fold contains positive validation examples (guaranteed non-empty test folds).
-Logistic Regression    | Acc: 74.18±9.27% | Rec: 43.94±20.80% | F1: 29.15±17.63% | PR-AUC: 0.4176±0.1623 | Brier: 0.1692±0.0449 | Feats: 10.8
-Random Forest          | Acc: 80.65±9.72% | Rec: 22.54±18.83% | F1: 19.79±17.67% | PR-AUC: 0.3978±0.1594 | Brier: 0.1317±0.0564 | Feats: 10.8
-XGBoost                | Acc: 72.81±9.36% | Rec: 46.75±17.11% | F1: 28.98±13.60% | PR-AUC: 0.3851±0.1367 | Brier: 0.1831±0.0582 | Feats: 10.8
+Logistic Regression    | Acc: 74.18±9.27% | Rec (th=0.5): 43.94±20.80% | Rec (Learned Th=0.54): 41.89±24.59% | PR-AUC: 0.4177±0.1622 | Brier: 0.1692±0.0447 | Feats: 10.8
+Random Forest          | Acc: 80.65±9.72% | Rec (th=0.5): 22.54±18.83% | Rec (Learned Th=0.36): 31.71±22.49% | PR-AUC: 0.3978±0.1594 | Brier: 0.1317±0.0564 | Feats: 10.8
+XGBoost                | Acc: 72.75±9.46% | Rec (th=0.5): 46.75±17.11% | Rec (Learned Th=0.42): 47.34±19.38% | PR-AUC: 0.3850±0.1368 | Brier: 0.1832±0.0583 | Feats: 10.8
 
 === MACRO-AVERAGE PERFORMANCE ACROSS ALL 24 ALLERGENS (ADAPTIVE FOLDS) ===
 Note: Includes 7 exploratory targets (2-4 cases) evaluated with adaptive folds (n_splits = pos_cases).
-Logistic Regression    | Acc: 78.74±11.17% | Rec: 34.25±24.20% | F1: 21.36±19.30% | PR-AUC: 0.3256±0.2013 | Brier: 0.1418±0.0601 | Feats: 10.0
-Random Forest          | Acc: 84.95±10.77% | Rec: 15.96±18.87% | F1: 14.02±17.37% | PR-AUC: 0.3164±0.1949 | Brier: 0.1051±0.0641 | Feats: 10.0
-XGBoost                | Acc: 78.23±11.92% | Rec: 36.24±23.03% | F1: 21.36±16.72% | PR-AUC: 0.3130±0.1748 | Brier: 0.1487±0.0748 | Feats: 10.0
+Logistic Regression    | Acc: 78.69±11.15% | Rec (th=0.5): 33.21±25.13% | Rec (Learned Th=0.55): 29.67±28.27% | PR-AUC: 0.3253±0.2016 | Brier: 0.1419±0.0599 | Feats: 10.0
+Random Forest          | Acc: 84.95±10.77% | Rec (th=0.5): 15.96±18.87% | Rec (Learned Th=0.32): 23.50±23.36% | PR-AUC: 0.3164±0.1949 | Brier: 0.1051±0.0641 | Feats: 10.0
+XGBoost                | Acc: 78.19±12.00% | Rec (th=0.5): 36.24±23.03% | Rec (Learned Th=0.40): 34.57±26.41% | PR-AUC: 0.3129±0.1748 | Brier: 0.1488±0.0749 | Feats: 10.0
 
 === QUANTITATIVE CALIBRATION ASSESSMENT (OUT-OF-FOLD) ===
 Metrics: Calibration Slope (ideal=1.0), Calibration Intercept (ideal=0.0), Expected Calibration Error (ECE)
 Note: Brier score, ECE, and slope assess probability scoring reliability; models output raw classifier probabilities without post-hoc Platt/isotonic recalibration.
-Logistic Regression    | Slope: 0.6016 | Intercept: -1.5403 | ECE: 0.1634
+Logistic Regression    | Slope: 0.6010 | Intercept: -1.5398 | ECE: 0.1633
 Random Forest          | Slope: 0.2945 | Intercept: -1.2454 | ECE: 0.0799
-XGBoost                | Slope: 0.3697 | Intercept: -1.5065 | ECE: 0.1351
+XGBoost                | Slope: 0.3692 | Intercept: -1.5065 | ECE: 0.1350
 
 Key Methodological Notes:
 1. Target-Specific Feature Selection: Features are selected strictly per allergen (Spearman correlation with target >= 0.15),
@@ -33,8 +33,8 @@ Key Methodological Notes:
    - Primary Evaluation: 17 targets with >= 5 positive cases (evaluated via standard 5-fold stratified CV).
    - Exploratory Evaluation: 7 targets with 2-4 positive cases (evaluated via adaptive 2–4 fold stratified CV to guarantee >= 1 positive per fold).
    - Excluded from Evaluation: 7 targets with < 2 positive cases (insufficient positive support for stratified folds).
-4. Clinical Risk Threshold Rationale:
-   - Binary risk decisions apply a 0.5 probability decision boundary under balanced class weighting (class_weight='balanced').
-   - Mathematically, balanced weighting shifts the logit intercept by ln(N_neg / N_pos), which makes the effective unweighted
-     decision threshold equivalent to ~10–20% (approx. class prevalence), specifically prioritizing clinical recall for rare positive outcomes.
-   - Inference service exposes configurable risk_threshold parameter for practitioners requiring tighter screening.
+4. Clinical Risk Threshold Rationale & Learned Decision Boundaries:
+   - Default binary decisions apply a 0.5 probability boundary under balanced class weighting (class_weight='balanced'),
+     mathematically equivalent to an unweighted population threshold of ~10–20% (approx. class prevalence).
+   - Furthermore, in-fold learned recall-oriented decision thresholds (F2 objective, prioritizing recall over precision)
+     were evaluated and persisted per allergen to minimize false negatives in clinical screening workflows.

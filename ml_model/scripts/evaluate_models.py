@@ -13,7 +13,7 @@ from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score,
+    accuracy_score, precision_score, recall_score, f1_score, fbeta_score,
     average_precision_score, confusion_matrix, precision_recall_curve,
     brier_score_loss
 )
@@ -41,6 +41,31 @@ ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
 
 print(f"Loading preprocessed data from: {DATA_PATH}")
 df = pd.read_csv(DATA_PATH)
+
+# Reconstruct raw survey age (range [14.0, 82.0] years) to guarantee
+# 100% identical MinMaxScaler fitting between CV and final training
+if df['age'].max() > 1.0:
+    df['raw_age'] = df['age'].copy()
+else:
+    df['raw_age'] = df['age'] * 68.0 + 14.0
+
+
+def find_optimal_threshold(y_true, y_prob, beta=2.0) -> float:
+    """
+    Learns an optimal decision threshold on training data using a recall-oriented F_beta objective.
+    F_2 places 4x the weight on recall compared to precision, prioritizing reduction of false negatives
+    in clinical allergy screening.
+    """
+    thresholds = np.linspace(0.15, 0.85, 71)
+    best_th = 0.50
+    best_score = -1.0
+    for th in thresholds:
+        pred = (y_prob >= th).astype(int)
+        score = fbeta_score(y_true, pred, beta=beta, zero_division=0)
+        if score > best_score:
+            best_score = score
+            best_th = float(th)
+    return round(best_th, 4)
 
 # ==========================================
 # 2. DEFINE FEATURES AND ALLERGEN TARGETS
@@ -111,10 +136,10 @@ for target_food in identified_allergens:
         y_train = y_single.iloc[train_idx]
         y_test = y_single.iloc[test_idx]
         
-        # 1. In-fold scaling (Fit strictly on training slice)
-        scaler = MinMaxScaler()
-        df_train['age'] = scaler.fit_transform(df_train[['age']])
-        df_test['age'] = scaler.transform(df_test[['age']])
+        # 1. In-fold scaling (Fit strictly on training slice raw_age, transform test slice)
+        scaler = MinMaxScaler(clip=True)
+        df_train['age'] = scaler.fit_transform(df_train[['raw_age']])
+        df_test['age'] = scaler.transform(df_test[['raw_age']])
         
         # 2. In-fold TARGET-SPECIFIC feature selection
         # Correlate features strictly with target_food on training fold (zero outcome contamination)
@@ -165,12 +190,27 @@ for target_food in identified_allergens:
                 all_y_true[model_name].extend(y_test.tolist())
                 all_y_prob[model_name].extend(y_prob.tolist())
             
+            # 1. Performance at default balanced boundary (threshold = 0.50)
             acc = accuracy_score(y_test, y_pred)
             prec = precision_score(y_test, y_pred, zero_division=0)
             rec = recall_score(y_test, y_pred, zero_division=0)
             f1 = f1_score(y_test, y_pred, zero_division=0)
             pr_auc = average_precision_score(y_test, y_prob) if (y_prob is not None and test_pos > 0) else np.nan
             brier = brier_score_loss(y_test, y_prob) if y_prob is not None else np.nan
+
+            # 2. Performance with in-fold learned recall-oriented decision threshold (F2 objective)
+            learned_th = 0.50
+            if hasattr(model, "predict_proba"):
+                y_prob_train = model.predict_proba(X_train)[:, 1]
+                learned_th = find_optimal_threshold(y_train, y_prob_train, beta=2.0)
+                y_pred_opt = (y_prob >= learned_th).astype(int)
+            else:
+                y_pred_opt = y_pred
+
+            acc_opt = accuracy_score(y_test, y_pred_opt)
+            prec_opt = precision_score(y_test, y_pred_opt, zero_division=0)
+            rec_opt = recall_score(y_test, y_pred_opt, zero_division=0)
+            f1_opt = f1_score(y_test, y_pred_opt, zero_division=0)
                 
             cm = confusion_matrix(y_test, y_pred, labels=[0, 1])
             tn, fp, fn, tp = cm.ravel()
@@ -188,6 +228,11 @@ for target_food in identified_allergens:
                 'Precision': prec,
                 'Recall': rec,
                 'F1_Score': f1,
+                'Accuracy_Learned': acc_opt,
+                'Precision_Learned': prec_opt,
+                'Recall_Learned': rec_opt,
+                'F1_Learned': f1_opt,
+                'Learned_Threshold': learned_th,
                 'PR_AUC': pr_auc,
                 'Brier_Score': brier,
                 'TP': tp,
@@ -207,6 +252,11 @@ target_summary = fold_df.groupby(['Allergen', 'Positive_Cases', 'Prevalence', 'M
     'Precision': 'mean',
     'Recall': 'mean',
     'F1_Score': 'mean',
+    'Accuracy_Learned': 'mean',
+    'Precision_Learned': 'mean',
+    'Recall_Learned': 'mean',
+    'F1_Learned': 'mean',
+    'Learned_Threshold': 'mean',
     'PR_AUC': 'mean',
     'Brier_Score': 'mean',
     'Features_Selected': 'mean',
@@ -222,6 +272,10 @@ agg_results = target_summary.groupby('Model').agg({
     'Precision': ['mean', 'std'],
     'Recall': ['mean', 'std'],
     'F1_Score': ['mean', 'std'],
+    'Recall_Learned': ['mean', 'std'],
+    'Precision_Learned': ['mean', 'std'],
+    'F1_Learned': ['mean', 'std'],
+    'Learned_Threshold': ['mean', 'std'],
     'PR_AUC': ['mean', 'std'],
     'Brier_Score': ['mean', 'std'],
     'Features_Selected': ['mean', 'std']
@@ -238,6 +292,10 @@ agg_results_ge5 = t_ge5.groupby('Model').agg({
     'Precision': ['mean', 'std'],
     'Recall': ['mean', 'std'],
     'F1_Score': ['mean', 'std'],
+    'Recall_Learned': ['mean', 'std'],
+    'Precision_Learned': ['mean', 'std'],
+    'F1_Learned': ['mean', 'std'],
+    'Learned_Threshold': ['mean', 'std'],
     'PR_AUC': ['mean', 'std'],
     'Brier_Score': ['mean', 'std'],
     'Features_Selected': ['mean', 'std']
@@ -254,10 +312,13 @@ for _, r in agg_results_ge5.iterrows():
     acc_m, acc_s = r['Accuracy_mean'] * 100, r['Accuracy_std'] * 100
     rec_m, rec_s = r['Recall_mean'] * 100, r['Recall_std'] * 100
     f1_m, f1_s = r['F1_Score_mean'] * 100, r['F1_Score_std'] * 100
+    rec_opt_m, rec_opt_s = r['Recall_Learned_mean'] * 100, r['Recall_Learned_std'] * 100
+    f1_opt_m, f1_opt_s = r['F1_Learned_mean'] * 100, r['F1_Learned_std'] * 100
+    th_m = r['Learned_Threshold_mean']
     pr_m, pr_s = r['PR_AUC_mean'], r['PR_AUC_std']
     br_m, br_s = r['Brier_Score_mean'], r['Brier_Score_std']
     feats_m = r['Features_Selected_mean']
-    print(f"{m:22s} | Acc: {acc_m:.2f}±{acc_s:.2f}% | Rec: {rec_m:.2f}±{rec_s:.2f}% | F1: {f1_m:.2f}±{f1_s:.2f}% | PR-AUC: {pr_m:.4f}±{pr_s:.4f} | Brier: {br_m:.4f}±{br_s:.4f} | Feats: {feats_m:.1f}")
+    print(f"{m:22s} | Acc: {acc_m:.2f}±{acc_s:.2f}% | Rec (th=0.5): {rec_m:.2f}±{rec_s:.2f}% | Rec (Learned Th={th_m:.2f}): {rec_opt_m:.2f}±{rec_opt_s:.2f}% | PR-AUC: {pr_m:.4f}±{pr_s:.4f} | Brier: {br_m:.4f}±{br_s:.4f}")
 
 print("\n" + "=" * 80)
 print("=== ALL 24 EVALUABLE ALLERGENS (ADAPTIVE STRATIFIED CV) ===")
@@ -267,10 +328,13 @@ for _, r in agg_results.iterrows():
     acc_m, acc_s = r['Accuracy_mean'] * 100, r['Accuracy_std'] * 100
     rec_m, rec_s = r['Recall_mean'] * 100, r['Recall_std'] * 100
     f1_m, f1_s = r['F1_Score_mean'] * 100, r['F1_Score_std'] * 100
+    rec_opt_m, rec_opt_s = r['Recall_Learned_mean'] * 100, r['Recall_Learned_std'] * 100
+    f1_opt_m, f1_opt_s = r['F1_Learned_mean'] * 100, r['F1_Learned_std'] * 100
+    th_m = r['Learned_Threshold_mean']
     pr_m, pr_s = r['PR_AUC_mean'], r['PR_AUC_std']
     br_m, br_s = r['Brier_Score_mean'], r['Brier_Score_std']
     feats_m = r['Features_Selected_mean']
-    print(f"{m:22s} | Acc: {acc_m:.2f}±{acc_s:.2f}% | Rec: {rec_m:.2f}±{rec_s:.2f}% | F1: {f1_m:.2f}±{f1_s:.2f}% | PR-AUC: {pr_m:.4f}±{pr_s:.4f} | Brier: {br_m:.4f}±{br_s:.4f} | Feats: {feats_m:.1f}")
+    print(f"{m:22s} | Acc: {acc_m:.2f}±{acc_s:.2f}% | Rec (th=0.5): {rec_m:.2f}±{rec_s:.2f}% | Rec (Learned Th={th_m:.2f}): {rec_opt_m:.2f}±{rec_opt_s:.2f}% | PR-AUC: {pr_m:.4f}±{pr_s:.4f} | Brier: {br_m:.4f}±{br_s:.4f}")
 print("=" * 80 + "\n")
 
 # Save detailed CSV files
@@ -339,13 +403,13 @@ with open(summary_txt_path, 'w', encoding='utf-8') as f:
     f.write("Note: Each fold contains positive validation examples (guaranteed non-empty test folds).\n")
     for _, r in agg_results_ge5.iterrows():
         m = r['Model']
-        f.write(f"{m:22s} | Acc: {r['Accuracy_mean']*100:.2f}±{r['Accuracy_std']*100:.2f}% | Rec: {r['Recall_mean']*100:.2f}±{r['Recall_std']*100:.2f}% | F1: {r['F1_Score_mean']*100:.2f}±{r['F1_Score_std']*100:.2f}% | PR-AUC: {r['PR_AUC_mean']:.4f}±{r['PR_AUC_std']:.4f} | Brier: {r['Brier_Score_mean']:.4f}±{r['Brier_Score_std']:.4f} | Feats: {r['Features_Selected_mean']:.1f}\n")
+        f.write(f"{m:22s} | Acc: {r['Accuracy_mean']*100:.2f}±{r['Accuracy_std']*100:.2f}% | Rec (th=0.5): {r['Recall_mean']*100:.2f}±{r['Recall_std']*100:.2f}% | Rec (Learned Th={r['Learned_Threshold_mean']:.2f}): {r['Recall_Learned_mean']*100:.2f}±{r['Recall_Learned_std']*100:.2f}% | PR-AUC: {r['PR_AUC_mean']:.4f}±{r['PR_AUC_std']:.4f} | Brier: {r['Brier_Score_mean']:.4f}±{r['Brier_Score_std']:.4f} | Feats: {r['Features_Selected_mean']:.1f}\n")
 
     f.write("\n=== MACRO-AVERAGE PERFORMANCE ACROSS ALL 24 ALLERGENS (ADAPTIVE FOLDS) ===\n")
     f.write("Note: Includes 7 exploratory targets (2-4 cases) evaluated with adaptive folds (n_splits = pos_cases).\n")
     for _, r in agg_results.iterrows():
         m = r['Model']
-        f.write(f"{m:22s} | Acc: {r['Accuracy_mean']*100:.2f}±{r['Accuracy_std']*100:.2f}% | Rec: {r['Recall_mean']*100:.2f}±{r['Recall_std']*100:.2f}% | F1: {r['F1_Score_mean']*100:.2f}±{r['F1_Score_std']*100:.2f}% | PR-AUC: {r['PR_AUC_mean']:.4f}±{r['PR_AUC_std']:.4f} | Brier: {r['Brier_Score_mean']:.4f}±{r['Brier_Score_std']:.4f} | Feats: {r['Features_Selected_mean']:.1f}\n")
+        f.write(f"{m:22s} | Acc: {r['Accuracy_mean']*100:.2f}±{r['Accuracy_std']*100:.2f}% | Rec (th=0.5): {r['Recall_mean']*100:.2f}±{r['Recall_std']*100:.2f}% | Rec (Learned Th={r['Learned_Threshold_mean']:.2f}): {r['Recall_Learned_mean']*100:.2f}±{r['Recall_Learned_std']*100:.2f}% | PR-AUC: {r['PR_AUC_mean']:.4f}±{r['PR_AUC_std']:.4f} | Brier: {r['Brier_Score_mean']:.4f}±{r['Brier_Score_std']:.4f} | Feats: {r['Features_Selected_mean']:.1f}\n")
 
     f.write("\n=== QUANTITATIVE CALIBRATION ASSESSMENT (OUT-OF-FOLD) ===\n")
     f.write("Metrics: Calibration Slope (ideal=1.0), Calibration Intercept (ideal=0.0), Expected Calibration Error (ECE)\n")
@@ -366,11 +430,11 @@ with open(summary_txt_path, 'w', encoding='utf-8') as f:
     f.write("   - Primary Evaluation: 17 targets with >= 5 positive cases (evaluated via standard 5-fold stratified CV).\n")
     f.write("   - Exploratory Evaluation: 7 targets with 2-4 positive cases (evaluated via adaptive 2–4 fold stratified CV to guarantee >= 1 positive per fold).\n")
     f.write("   - Excluded from Evaluation: 7 targets with < 2 positive cases (insufficient positive support for stratified folds).\n")
-    f.write("4. Clinical Risk Threshold Rationale:\n")
-    f.write("   - Binary risk decisions apply a 0.5 probability decision boundary under balanced class weighting (class_weight='balanced').\n")
-    f.write("   - Mathematically, balanced weighting shifts the logit intercept by ln(N_neg / N_pos), which makes the effective unweighted\n")
-    f.write("     decision threshold equivalent to ~10–20% (approx. class prevalence), specifically prioritizing clinical recall for rare positive outcomes.\n")
-    f.write("   - Inference service exposes configurable risk_threshold parameter for practitioners requiring tighter screening.\n")
+    f.write("4. Clinical Risk Threshold Rationale & Learned Decision Boundaries:\n")
+    f.write("   - Default binary decisions apply a 0.5 probability boundary under balanced class weighting (class_weight='balanced'),\n")
+    f.write("     mathematically equivalent to an unweighted population threshold of ~10–20% (approx. class prevalence).\n")
+    f.write("   - Furthermore, in-fold learned recall-oriented decision thresholds (F2 objective, prioritizing recall over precision)\n")
+    f.write("     were evaluated and persisted per allergen to minimize false negatives in clinical screening workflows.\n")
 
 print(f"Summary text report saved to: {summary_txt_path}")
 

@@ -64,6 +64,32 @@
     "exploratory": "Targets with 2-4 positive cases (7 allergens, low sample prevalence, high-variance pilot indicators)",
     "excluded": "Targets with < 2 positive cases (7 allergens, insufficient data to model)"
   },
+  "learned_thresholds": {
+    "milk": 0.47,
+    "eggs": 0.74,
+    "peanuts": 0.56,
+    "tree_nuts": 0.64,
+    "wheat": 0.66,
+    "soy": 0.57,
+    "sesame": 0.52,
+    "prawns": 0.42,
+    "crab": 0.5,
+    "cuttlefish / squid": 0.6,
+    "dry_fish": 0.68,
+    "tuna": 0.6,
+    "beef": 0.52,
+    "pork": 0.39,
+    "mutton": 0.43,
+    "coconut": 0.64,
+    "spicy_oily": 0.4,
+    "jackfruit": 0.6,
+    "pineapple": 0.55,
+    "tomato": 0.71,
+    "rambutan": 0.71,
+    "mustard": 0.65,
+    "fenugreek": 0.54,
+    "cumin": 0.68
+  },
   "models": [
     {
       "allergen": "milk",
@@ -83,7 +109,9 @@
         "family_allergy_dairy",
         "blood_type_I don't know / Not sure",
         "work_env_chemicals_or_strong_fumes"
-      ]
+      ],
+      "learned_threshold": 0.47,
+      "default_threshold": 0.5
     },
     {
       "allergen": "eggs",
@@ -101,7 +129,9 @@
         "work_env_agricultural_or_plant_materials",
         "work_env_continuous_air_conditioning",
         "work_env_standard_home_environment_work_from_home___remote"
-      ]
+      ],
+      "learned_threshold": 0.74,
+      "default_threshold": 0.5
     },
     {
       "allergen": "peanuts",
@@ -120,7 +150,9 @@
         "blood_type_AB+",
         "work_env_agricultural_or_plant_materials",
         "work_env_chemicals_or_strong_fumes"
-      ]
+      ],
+      "learned_threshold": 0.56,
+      "default_threshold": 0.5
     },
     {
       "allergen": "tree_nuts",
@@ -141,7 +173,9 @@
         "work_env_chemicals_or_strong_fumes",
         "work_env_continuous_air_conditioning",
         "work_env_standard_home_environment_work_from_home___remote"
-      ]
+      ],
+      "learned_threshold": 0.64,
+      "default_threshold": 0.5
     },
     {
       "allergen": "wheat",
@@ -162,7 +196,9 @@
         "work_env_agricultural_or_plant_materials",
         "work_env_dust_or_strong_pollutants",
         "work_env_standard_home_environment_work_from_home___remote"
-      ]
+      ],
+      "learned_threshold": 0.66,
+      "default_threshold": 0.5
     },
     {
       "allergen": "soy",
@@ -180,7 +216,9 @@
         "blood_type_AB+",
         "work_env_agricultural_or_plant_materials",
         "work_env_standard_home_environment_work_from_home___remote"
-      ]
+      ],
+      "learned_threshold": 0.57,
+      "default_threshold": 0.5
     },
     {
       "allergen": "sesame",
@@ -200,7 +238,9 @@
         "work_env_agricultural_or_plant_materials",
         "work_env_chemicals_or_strong_fumes",
         "work_env_standard_home_environment_work_from_home___remote"
-      ]
+      ],
+      "learned_threshold": 0.52,
+      "default_threshold": 0.5
     },
     {
       "allergen": "prawns",
@@ -220,7 +260,9 @@
         "province_Uva Province",
         "blood_type_A+",
         "work_env_chemicals_or_strong_fumes"
-      ]
+      ],
+      "learned_threshold": 0.42,
+      "default_threshold": 0.5
     },
     {
       "allergen": "crab",
@@ -243,7 +285,9 @@
         "work_env_agricultural_or_plant_materials",
         "work_env_chemicals_or_strong_fumes",
         "work_env_extreme_heat_or_direct_sunlight"
-      ]
+      ],
+      "learned_threshold": 0.5,
+      "default_threshold": 0.5
     },
     {
       "allergen": "cuttlefish / squid",
@@ -262,7 +306,9 @@
         "blood_type_A+",
         "work_env_agricultural_or_plant_materials",
         "work_env_chemicals_or_strong_fumes"
-      ]
+      ],
+      "learned_threshold": 0.6,
+      "default_threshold": 0.5
     },
     {
       "allergen": "dry_fish",
@@ -281,7 +327,9 @@
         "family_allergy_dairy",
         "province_Uva Province",
         "work_env_chemicals_or_strong_fumes"
-      ]
+      ],
+      "learned_threshold": 0.68,
+      "default_threshold": 0.5
     },
     {
       "allergen": "tuna",
@@ -302,7 +350,9 @@
         "family_allergy_seafood",
         "family_allergy_dairy",
         "work_env_chemicals_or_strong_fumes"
-      ]
+      ],
+      "learned_threshold": 0.6,
+      "default_threshold": 0.5
     },
     {
       "allergen": "beef",
@@ -326,7 +376,9 @@
         "province_Western Province",
         "dietary_pattern_Omnivore (Eats everything)",
         "dietary_pattern_Vegetarian (Eats dairy/eggs, no meat)"
-      ]
+      ],
+      "learned_threshold": 0.52,
+      "default_threshold": 0.5
     },
     {
       "allergen": "pork",
@@ -353,7 +405,9 @@
         "work_env_dust_or_strong_pollutants",
         "work_env_none_of_the_above",
         "work_env_standard_home_environment_work_from_home___remote"
-      ]
+      ],
+      "learned_threshold": 0.39,
+      "default_threshold": 0.5
     },
     {
       "allergen": "mutton",
@@ -376,7 +430,9 @@
         "dietary_pattern_Vegetarian (Eats dairy/eggs, no meat)",
         "work_env_agricultural_or_plant_materials",
         "work_env_dust_or_strong_pollutants"
-      ]
+      ],
+      "learned_threshold": 0.43,
+      "default_threshold": 0.5
     },
     {
       "allergen": "coconut",
@@ -394,7 +450,9 @@
         "dietary_pattern_Vegetarian (Eats dairy/eggs, no meat)",
         "work_env_agricultural_or_plant_materials",
         "work_env_standard_home_environment_work_from_home___remote"
-      ]
+      ],
+      "learned_threshold": 0.64,
+      "default_threshold": 0.5
     },
     {
       "allergen": "spicy_oily",
@@ -412,7 +470,9 @@
         "family_allergy_flour",
         "work_env_chemicals_or_strong_fumes",
         "work_env_extreme_heat_or_direct_sunlight"
-      ]
+      ],
+      "learned_threshold": 0.4,
+      "default_threshold": 0.5
     },
     {
       "allergen": "jackfruit",
@@ -427,7 +487,9 @@
         "work_env_dust_or_strong_pollutants",
         "work_env_extreme_heat_or_direct_sunlight",
         "work_env_standard_home_environment_work_from_home___remote"
-      ]
+      ],
+      "learned_threshold": 0.6,
+      "default_threshold": 0.5
     },
     {
       "allergen": "pineapple",
@@ -452,7 +514,9 @@
         "work_env_chemicals_or_strong_fumes",
         "work_env_dust_or_strong_pollutants",
         "work_env_extreme_heat_or_direct_sunlight"
-      ]
+      ],
+      "learned_threshold": 0.55,
+      "default_threshold": 0.5
     },
     {
       "allergen": "tomato",
@@ -470,7 +534,9 @@
         "family_allergy_dairy",
         "province_Uva Province",
         "work_env_chemicals_or_strong_fumes"
-      ]
+      ],
+      "learned_threshold": 0.71,
+      "default_threshold": 0.5
     },
     {
       "allergen": "rambutan",
@@ -491,7 +557,9 @@
         "work_env_agricultural_or_plant_materials",
         "work_env_dust_or_strong_pollutants",
         "work_env_extreme_heat_or_direct_sunlight"
-      ]
+      ],
+      "learned_threshold": 0.71,
+      "default_threshold": 0.5
     },
     {
       "allergen": "mustard",
@@ -509,7 +577,9 @@
         "blood_type_A-",
         "work_env_chemicals_or_strong_fumes",
         "work_env_continuous_air_conditioning"
-      ]
+      ],
+      "learned_threshold": 0.65,
+      "default_threshold": 0.5
     },
     {
       "allergen": "fenugreek",
@@ -526,7 +596,9 @@
         "med_cond_none_of_these",
         "province_Central Province",
         "work_env_dust_or_strong_pollutants"
-      ]
+      ],
+      "learned_threshold": 0.54,
+      "default_threshold": 0.5
     },
     {
       "allergen": "cumin",
@@ -544,7 +616,9 @@
         "blood_type_A+",
         "work_env_agricultural_or_plant_materials",
         "work_env_dust_or_strong_pollutants"
-      ]
+      ],
+      "learned_threshold": 0.68,
+      "default_threshold": 0.5
     }
   ]
 }

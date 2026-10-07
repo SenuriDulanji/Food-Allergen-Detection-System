@@ -387,6 +387,46 @@ def validate_pipeline_alignment() -> bool:
         return False
 
 
+_age_scaler: Any = None
+_metadata_by_key: dict[str, dict] | None = None
+
+
+def _get_age_scaler():
+    """Load and cache the MinMaxScaler fitted on survey age during model training."""
+    global _age_scaler
+    if _age_scaler is None:
+        scaler_path = ARTIFACTS_DIR / "age_scaler.joblib"
+        if scaler_path.exists():
+            try:
+                _age_scaler = joblib.load(scaler_path)
+                logger.debug("Loaded age_scaler.joblib successfully.")
+            except Exception as e:
+                logger.warning("Could not load age_scaler.joblib: %s", e)
+    return _age_scaler
+
+
+def _get_model_metadata(model_key: str) -> dict:
+    """Load and return metadata for a model key, including target-specific learned thresholds."""
+    global _metadata_by_key
+    if _metadata_by_key is None:
+        _metadata_by_key = {}
+        metadata_file = ARTIFACTS_DIR / "model_metadata.json"
+        if metadata_file.exists():
+            try:
+                with open(metadata_file, "r", encoding="utf-8") as f:
+                    meta = json.load(f)
+                for item in meta.get("models", []):
+                    art_stem = item.get("artifact_file", "").removeprefix("risk_model_").removesuffix(".joblib")
+                    if art_stem:
+                        _metadata_by_key[art_stem] = item
+                    clean_all = _ingredient_to_model_key(item.get("allergen", ""))
+                    if clean_all:
+                        _metadata_by_key[clean_all] = item
+            except Exception as e:
+                logger.warning("Could not load model_metadata.json for per-model thresholds: %s", e)
+    return _metadata_by_key.get(model_key, {})
+
+
 def _get_known_model_keys() -> set[str]:
     """Return (and cache) the set of ingredient stems for which a model exists."""
     global _known_model_keys
@@ -566,8 +606,13 @@ def build_feature_vector(user_profile: dict[str, Any]) -> pd.DataFrame:
             elif col == "age":
                 try:
                     num_age = float(val)
-                    # If raw age in years (e.g. 25), scale to [0, 1] using survey bounds [14, 82]
-                    if num_age > 1.0:
+                    scaler = _get_age_scaler()
+                    if scaler is not None:
+                        # Use the exact fitted MinMaxScaler from training pipeline
+                        scaled_val = float(scaler.transform([[num_age]])[0][0])
+                        row[col] = float(np.clip(scaled_val, 0.0, 1.0))
+                    elif num_age > 1.0:
+                        # Fallback to survey bounds [14, 82]
                         row[col] = float(np.clip((num_age - 14.0) / 68.0, 0.0, 1.0))
                     else:
                         row[col] = max(0.0, num_age)
@@ -669,7 +714,7 @@ def build_feature_vector(user_profile: dict[str, Any]) -> pd.DataFrame:
 def predict_dish_safety(
     detected_ingredients: list[str],
     user_profile: dict[str, Any] | None = None,
-    risk_threshold: float = 0.5,
+    risk_threshold: float | None = None,
 ) -> dict:
     """
     Unified Intelligence Engine — predicts allergen risk for a list of
@@ -681,12 +726,9 @@ def predict_dish_safety(
         user_profile:         Dict of user demographic / medical features.
                               Pass None or {} to run with zero-vector
                               (baseline profile without reported conditions/exposures).
-        risk_threshold:       Decision threshold for classifying heightened risk
-                              (default: 0.5). Under class_weight='balanced', the
-                              logit shift ln(N_neg / N_pos) makes 0.5 correspond
-                              to an effective unweighted population threshold of
-                              ~10-20%, specifically adapted to prioritize clinical recall.
-                              Lower values (e.g. 0.35) enable ultra-sensitive screening.
+        risk_threshold:       Optional decision threshold override (float, e.g. 0.35 or 0.50).
+                              If None (default), uses the per-allergen optimal threshold learned
+                              during model training and stored in model_metadata.json (F2 recall-oriented).
 
     Returns:
         {
@@ -700,6 +742,8 @@ def predict_dish_safety(
               "risk_probability": str,      # predicted positive-class probability (e.g. '72.4%')
               "predicted_probability": str, # alias for risk_probability
               "confidence": str,            # alias for risk_probability (retained for backward compatibility)
+              "threshold_applied": float,   # decision threshold evaluated for this allergen
+              "threshold_source": str,      # 'learned_optimal' or 'custom_override'
               "msg": str
             }, ...
           ],
@@ -712,7 +756,8 @@ def predict_dish_safety(
           ],
           "models_evaluated": int,    # how many ML models were found & run
           "ingredients_checked": int, # total ingredients evaluated
-          "risk_threshold": float     # active classification threshold applied
+          "risk_threshold": Any,      # active threshold or 'per_model_learned'
+          "threshold_mode": str       # 'learned_optimal' or 'custom_override'
         }
     """
     if user_profile is None:
@@ -723,7 +768,8 @@ def predict_dish_safety(
         "safety_net_warnings": [],
         "models_evaluated": 0,
         "ingredients_checked": len(detected_ingredients),
-        "risk_threshold": risk_threshold,
+        "risk_threshold": risk_threshold if risk_threshold is not None else "per_model_learned",
+        "threshold_mode": "custom_override" if risk_threshold is not None else "learned_optimal",
     }
 
     # ── Build feature vector once for all model calls ─────────────────── #
@@ -767,6 +813,16 @@ def predict_dish_safety(
             else:
                 X_model = X
 
+            # Lookup per-allergen learned threshold from metadata, or apply user override
+            meta = _get_model_metadata(resolved_key)
+            learned_th = float(meta.get("learned_threshold", 0.50))
+            if risk_threshold is not None:
+                active_threshold = float(risk_threshold)
+                threshold_source = "custom_override"
+            else:
+                active_threshold = learned_th
+                threshold_source = "learned_optimal"
+
             # Compute predicted positive-class probability
             try:
                 proba = float(model.predict_proba(X_model)[0][1])
@@ -775,26 +831,29 @@ def predict_dish_safety(
                 proba = None
                 confidence_pct = "N/A"
 
-            # Evaluate decision threshold (default 0.5 incorporates balanced class weighting)
+            # Evaluate decision threshold
             if proba is not None:
-                risk_pred = 1 if proba >= risk_threshold else 0
+                risk_pred = 1 if proba >= active_threshold else 0
             else:
                 risk_pred = int(model.predict(X_model)[0])
 
+            if risk_pred > 0:
                 is_exploratory = resolved_key in EXPLORATORY_MODEL_KEYS
                 tier = "exploratory" if is_exploratory else "primary"
 
                 if is_exploratory:
                     msg = (
                         f"⚠️ Exploratory sensitivity indicator for '{ingredient}' "
-                        f"(resolved → '{resolved_key}', estimated risk probability: {confidence_pct}). "
+                        f"(resolved → '{resolved_key}', estimated risk probability: {confidence_pct}, "
+                        f"threshold: {active_threshold:.2f}). "
                         "Note: Model trained on preliminary pilot data with low survey prevalence (2–4 cases); "
                         "interpret as an exploratory pilot signal, not a clinically validated predictor."
                     )
                 else:
                     msg = (
                         f"⚠️ Heightened sensitivity risk detected for '{ingredient}' "
-                        f"(resolved → '{resolved_key}', estimated risk probability: {confidence_pct}). "
+                        f"(resolved → '{resolved_key}', estimated risk probability: {confidence_pct}, "
+                        f"threshold: {active_threshold:.2f}). "
                         "Your self-reported profile indicates a statistical risk (pilot indicator, not a clinical allergy diagnosis)."
                     )
 
@@ -807,11 +866,13 @@ def predict_dish_safety(
                     "risk_probability": confidence_pct,
                     "predicted_probability": confidence_pct,
                     "confidence": confidence_pct,
+                    "threshold_applied": active_threshold,
+                    "threshold_source": threshold_source,
                     "msg": msg,
                 })
                 logger.info(
-                    "ML model flagged '%s' (key='%s') | risk=%d | probability=%s",
-                    ingredient, resolved_key, risk_pred, confidence_pct,
+                    "ML model flagged '%s' (key='%s') | risk=%d | probability=%s | threshold=%.2f (%s)",
+                    ingredient, resolved_key, risk_pred, confidence_pct, active_threshold, threshold_source
                 )
         except Exception as exc:
             logger.error(

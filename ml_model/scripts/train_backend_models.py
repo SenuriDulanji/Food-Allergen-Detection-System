@@ -1,9 +1,12 @@
 import sys
 import json
+import numpy as np
 import pandas as pd
 import joblib
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import fbeta_score
 
 # Safely configure standard output encoding for Windows consoles
 if hasattr(sys.stdout, 'reconfigure'):
@@ -23,13 +26,36 @@ print(f"Loading data from: {DATA_PATH}")
 df = pd.read_csv(DATA_PATH)
 print(f"Dataset shape: {df.shape[0]} rows x {df.shape[1]} columns")
 
-# Ensure 'age' is scaled to [0, 1] using survey bounds [14.0, 82.0]
-# If raw age (max > 1.0), scale it; if already scaled [0, 1], confirm and retain.
+# Determine raw survey age (survey range [14.0, 82.0] years)
+# to guarantee 100% identical MinMaxScaler fitting across CV and final training
 if df['age'].max() > 1.0:
-    print(f"Normalizing raw age (range [{df['age'].min()}, {df['age'].max()}]) to [0, 1] using bounds [14.0, 82.0]...")
-    df['age'] = ((df['age'] - 14.0) / 68.0).clip(0.0, 1.0)
+    raw_age = df['age'].copy()
 else:
-    print(f"Verified age is already scaled in [0, 1] (min={df['age'].min():.4f}, max={df['age'].max():.4f}, mean={df['age'].mean():.4f}).")
+    raw_age = df['age'] * 68.0 + 14.0
+
+# Fit and persist standard MinMaxScaler artifact for deployment inference
+age_scaler = MinMaxScaler(clip=True)
+df['age'] = age_scaler.fit_transform(raw_age.to_numpy().reshape(-1, 1)).ravel()
+joblib.dump(age_scaler, ARTIFACTS_DIR / "age_scaler.joblib")
+print(f"Fitted & saved age_scaler.joblib (data_min={age_scaler.data_min_[0]:.1f}, data_max={age_scaler.data_max_[0]:.1f}).")
+
+
+def find_optimal_threshold(y_true, y_prob, beta=2.0) -> float:
+    """
+    Learns an optimal decision threshold on training data using a recall-oriented F_beta objective.
+    F_2 places 4x the weight on recall compared to precision, prioritizing reduction of false negatives
+    in clinical allergy screening.
+    """
+    thresholds = np.linspace(0.15, 0.85, 71)
+    best_th = 0.50
+    best_score = -1.0
+    for th in thresholds:
+        pred = (y_prob >= th).astype(int)
+        score = fbeta_score(y_true, pred, beta=beta, zero_division=0)
+        if score > best_score:
+            best_score = score
+            best_th = float(th)
+    return round(best_th, 4)
 
 # ==========================================
 # 2. DEFINE FEATURES AND TARGETS
@@ -112,6 +138,10 @@ for target_food in identified_allergens:
         # Save the trained model artifact to disk
         joblib.dump(model, file_path)
         
+        # Determine learned decision threshold using recall-oriented F2 objective
+        proba_train = model.predict_proba(X_target)[:, 1]
+        learned_th = find_optimal_threshold(y_single_target, proba_train, beta=2.0)
+        
         success_count += 1
         tier = "primary" if positive_cases >= 5 else "exploratory"
         tier_desc = (
@@ -127,9 +157,11 @@ for target_food in identified_allergens:
             "tier": tier,
             "tier_description": tier_desc,
             "features_count": len(features_to_keep),
-            "selected_features": features_to_keep
+            "selected_features": features_to_keep,
+            "learned_threshold": learned_th,
+            "default_threshold": 0.50
         })
-        print(f"✅ Trained & Saved: {target_food.upper():20s} [{tier.upper():11s}] (Cases: {positive_cases:2d}/{len(df)}, Features: {len(features_to_keep):2d}) -> {file_path.name}")
+        print(f"✅ Trained & Saved: {target_food.upper():20s} [{tier.upper():11s}] (Cases: {positive_cases:2d}/{len(df)}, Features: {len(features_to_keep):2d}, Learned Th: {learned_th:.2f}) -> {file_path.name}")
         
     except Exception as e:
         print(f"❌ Failed to train {target_food.upper()}: {e}")
@@ -153,6 +185,7 @@ metadata_content = {
         "exploratory": "Targets with 2-4 positive cases (7 allergens, low sample prevalence, high-variance pilot indicators)",
         "excluded": "Targets with < 2 positive cases (7 allergens, insufficient data to model)"
     },
+    "learned_thresholds": {m["allergen"]: m["learned_threshold"] for m in trained_metadata},
     "models": trained_metadata
 }
 with open(metadata_path, 'w', encoding='utf-8') as f:

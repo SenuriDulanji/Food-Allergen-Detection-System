@@ -58,8 +58,8 @@ soy,5,Random Forest,0,5,80,5
 soy,5,XGBoost,2,12,73,3
 spicy_oily,18,Logistic Regression,2,26,46,16
 spicy_oily,18,Random Forest,1,14,58,17
-spicy_oily,18,XGBoost,5,23,49,13
-tomato,4,Logistic Regression,1,13,73,3
+spicy_oily,18,XGBoost,5,24,48,13
+tomato,4,Logistic Regression,0,13,73,4
 tomato,4,Random Forest,0,0,86,4
 tomato,4,XGBoost,1,7,79,3
 tree_nuts,6,Logistic Regression,1,13,71,5
