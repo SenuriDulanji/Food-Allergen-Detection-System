@@ -23,6 +23,14 @@ print(f"Loading data from: {DATA_PATH}")
 df = pd.read_csv(DATA_PATH)
 print(f"Dataset shape: {df.shape[0]} rows x {df.shape[1]} columns")
 
+# Ensure 'age' is scaled to [0, 1] using survey bounds [14.0, 82.0]
+# If raw age (max > 1.0), scale it; if already scaled [0, 1], confirm and retain.
+if df['age'].max() > 1.0:
+    print(f"Normalizing raw age (range [{df['age'].min()}, {df['age'].max()}]) to [0, 1] using bounds [14.0, 82.0]...")
+    df['age'] = ((df['age'] - 14.0) / 68.0).clip(0.0, 1.0)
+else:
+    print(f"Verified age is already scaled in [0, 1] (min={df['age'].min():.4f}, max={df['age'].max():.4f}, mean={df['age'].mean():.4f}).")
+
 # ==========================================
 # 2. DEFINE FEATURES AND TARGETS
 # ==========================================
