@@ -123,6 +123,7 @@ metadata_path = ARTIFACTS_DIR / "model_metadata.json"
 metadata_content = {
     "total_training_samples": len(df),
     "candidate_features_count": len(feature_cols),
+    "candidate_features": feature_cols,
     "feature_selection_method": "Target-specific Spearman correlation (|rho| >= 0.15)",
     "threshold": THRESHOLD,
     "models_trained_count": success_count,

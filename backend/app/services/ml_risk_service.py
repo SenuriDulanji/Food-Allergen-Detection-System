@@ -14,6 +14,7 @@ Public API:
 
 from __future__ import annotations
 
+import json
 import logging
 from functools import lru_cache
 from pathlib import Path
@@ -333,12 +334,55 @@ _model_cache: dict[str, Any] = {}
 # Lazily-built set of all model stems present in ARTIFACTS_DIR
 # e.g. {"prawns", "crab", "beef", ...}
 _known_model_keys: set[str] | None = None
+_pipeline_validated: bool = False
+
+
+def validate_pipeline_alignment() -> bool:
+    """
+    Verify that ALL_POSSIBLE_FEATURES matches candidate_features in model_metadata.json
+    and that all trained models have their required predictors present in the candidate space.
+    """
+    global _pipeline_validated
+    if _pipeline_validated:
+        return True
+
+    metadata_file = ARTIFACTS_DIR / "model_metadata.json"
+    if not metadata_file.exists():
+        _pipeline_validated = True
+        return True
+
+    try:
+        with open(metadata_file, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+        cand_features = meta.get("candidate_features")
+        if cand_features:
+            cand_set = set(cand_features)
+            backend_set = set(ALL_POSSIBLE_FEATURES)
+            if cand_set != backend_set:
+                diff_missing = cand_set - backend_set
+                diff_extra = backend_set - cand_set
+                logger.error(
+                    "Pipeline desynchronisation: model_metadata.json != ALL_POSSIBLE_FEATURES! "
+                    "Missing: %s | Extra: %s",
+                    diff_missing, diff_extra
+                )
+                return False
+            logger.debug(
+                "Pipeline verified: ALL_POSSIBLE_FEATURES identically matches model_metadata.json (%d features).",
+                len(ALL_POSSIBLE_FEATURES)
+            )
+        _pipeline_validated = True
+        return True
+    except Exception as exc:
+        logger.warning("Could not read model_metadata.json for schema verification: %s", exc)
+        return False
 
 
 def _get_known_model_keys() -> set[str]:
     """Return (and cache) the set of ingredient stems for which a model exists."""
     global _known_model_keys
     if _known_model_keys is None:
+        validate_pipeline_alignment()
         _known_model_keys = set()
         if ARTIFACTS_DIR.exists():
             for f in ARTIFACTS_DIR.glob("risk_model_*.joblib"):
@@ -450,7 +494,15 @@ def _load_model(ingredient: str) -> tuple[Any, str] | tuple[None, None]:
         model_path = ARTIFACTS_DIR / f"risk_model_{key}.joblib"
         if model_path.exists():
             try:
-                _model_cache[key] = joblib.load(model_path)
+                loaded_model = joblib.load(model_path)
+                if hasattr(loaded_model, "feature_names_in_"):
+                    missing = set(loaded_model.feature_names_in_) - set(ALL_POSSIBLE_FEATURES)
+                    if missing:
+                        logger.error(
+                            "Model '%s' expects features missing from candidate space: %s",
+                            key, missing
+                        )
+                _model_cache[key] = loaded_model
                 logger.debug("Loaded ML model for '%s' (key='%s')", ingredient, key)
             except Exception as exc:
                 logger.error("Failed to load model '%s': %s", key, exc)
@@ -681,7 +733,18 @@ def predict_dish_safety(
 
         try:
             if hasattr(model, "feature_names_in_"):
-                X_model = X.reindex(columns=model.feature_names_in_, fill_value=0.0)
+                # Strict schema verification: check if any required feature is absent
+                missing_features = [col for col in model.feature_names_in_ if col not in X.columns]
+                if missing_features:
+                    logger.error(
+                        "Schema mismatch: Model '%s' requires features %s absent from candidate space! "
+                        "Imputing 0.0 to prevent crash, but training/inference pipelines are desynchronised.",
+                        resolved_key, missing_features
+                    )
+                    X_model = X.reindex(columns=model.feature_names_in_, fill_value=0.0)
+                else:
+                    # Direct subset slicing: guarantees exact feature alignment without silent zero-padding
+                    X_model = X[list(model.feature_names_in_)]
             else:
                 X_model = X
 
