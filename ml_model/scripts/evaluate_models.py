@@ -349,6 +349,7 @@ with open(summary_txt_path, 'w', encoding='utf-8') as f:
 
     f.write("\n=== QUANTITATIVE CALIBRATION ASSESSMENT (OUT-OF-FOLD) ===\n")
     f.write("Metrics: Calibration Slope (ideal=1.0), Calibration Intercept (ideal=0.0), Expected Calibration Error (ECE)\n")
+    f.write("Note: Brier score, ECE, and slope assess probability scoring reliability; models output raw classifier probabilities without post-hoc Platt/isotonic recalibration.\n")
     for m_name, vals in calib_metrics.items():
         f.write(f"{m_name:22s} | Slope: {vals['slope']:.4f} | Intercept: {vals['intercept']:.4f} | ECE: {vals['ece']:.4f}\n")
 
@@ -361,10 +362,15 @@ with open(summary_txt_path, 'w', encoding='utf-8') as f:
     f.write("     substantially outperforming Random Forest (22.54%) and matching XGBoost (46.75%).\n")
     f.write("   - Logistic Regression was chosen for deployment due to model transparency, interpretable odds ratios,\n")
     f.write("     and deterministic edge inference without black-box synthetic oversampling artifacts.\n")
-    f.write("3. Target Categorization (31 total survey items):\n")
-    f.write("   - Primary Evaluation: 17 targets with >= 5 positive cases (5-fold stratified CV).\n")
-    f.write("   - Exploratory Evaluation: 7 targets with 2-4 positive cases (adaptive folds: n_splits = pos_cases).\n")
-    f.write("   - Excluded from Evaluation: 7 targets with < 2 positive cases (insufficient support for stratified CV).\n")
+    f.write("3. Target Categorization & CV Fold Distinctions (31 total survey items):\n")
+    f.write("   - Primary Evaluation: 17 targets with >= 5 positive cases (evaluated via standard 5-fold stratified CV).\n")
+    f.write("   - Exploratory Evaluation: 7 targets with 2-4 positive cases (evaluated via adaptive 2–4 fold stratified CV to guarantee >= 1 positive per fold).\n")
+    f.write("   - Excluded from Evaluation: 7 targets with < 2 positive cases (insufficient positive support for stratified folds).\n")
+    f.write("4. Clinical Risk Threshold Rationale:\n")
+    f.write("   - Binary risk decisions apply a 0.5 probability decision boundary under balanced class weighting (class_weight='balanced').\n")
+    f.write("   - Mathematically, balanced weighting shifts the logit intercept by ln(N_neg / N_pos), which makes the effective unweighted\n")
+    f.write("     decision threshold equivalent to ~10–20% (approx. class prevalence), specifically prioritizing clinical recall for rare positive outcomes.\n")
+    f.write("   - Inference service exposes configurable risk_threshold parameter for practitioners requiring tighter screening.\n")
 
 print(f"Summary text report saved to: {summary_txt_path}")
 

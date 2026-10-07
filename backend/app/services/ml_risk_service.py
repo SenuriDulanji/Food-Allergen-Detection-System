@@ -669,6 +669,7 @@ def build_feature_vector(user_profile: dict[str, Any]) -> pd.DataFrame:
 def predict_dish_safety(
     detected_ingredients: list[str],
     user_profile: dict[str, Any] | None = None,
+    risk_threshold: float = 0.5,
 ) -> dict:
     """
     Unified Intelligence Engine — predicts allergen risk for a list of
@@ -680,6 +681,12 @@ def predict_dish_safety(
         user_profile:         Dict of user demographic / medical features.
                               Pass None or {} to run with zero-vector
                               (baseline profile without reported conditions/exposures).
+        risk_threshold:       Decision threshold for classifying heightened risk
+                              (default: 0.5). Under class_weight='balanced', the
+                              logit shift ln(N_neg / N_pos) makes 0.5 correspond
+                              to an effective unweighted population threshold of
+                              ~10-20%, specifically adapted to prioritize clinical recall.
+                              Lower values (e.g. 0.35) enable ultra-sensitive screening.
 
     Returns:
         {
@@ -704,7 +711,8 @@ def predict_dish_safety(
             }, ...
           ],
           "models_evaluated": int,    # how many ML models were found & run
-          "ingredients_checked": int  # total ingredients evaluated
+          "ingredients_checked": int, # total ingredients evaluated
+          "risk_threshold": float     # active classification threshold applied
         }
     """
     if user_profile is None:
@@ -715,6 +723,7 @@ def predict_dish_safety(
         "safety_net_warnings": [],
         "models_evaluated": 0,
         "ingredients_checked": len(detected_ingredients),
+        "risk_threshold": risk_threshold,
     }
 
     # ── Build feature vector once for all model calls ─────────────────── #
@@ -758,14 +767,19 @@ def predict_dish_safety(
             else:
                 X_model = X
 
-            risk_pred = int(model.predict(X_model)[0])
+            # Compute predicted positive-class probability
+            try:
+                proba = float(model.predict_proba(X_model)[0][1])
+                confidence_pct = f"{proba * 100:.1f}%"
+            except Exception:
+                proba = None
+                confidence_pct = "N/A"
 
-            if risk_pred > 0:
-                try:
-                    proba = float(model.predict_proba(X_model)[0][1])
-                    confidence_pct = f"{proba * 100:.1f}%"
-                except Exception:
-                    confidence_pct = "N/A"
+            # Evaluate decision threshold (default 0.5 incorporates balanced class weighting)
+            if proba is not None:
+                risk_pred = 1 if proba >= risk_threshold else 0
+            else:
+                risk_pred = int(model.predict(X_model)[0])
 
                 is_exploratory = resolved_key in EXPLORATORY_MODEL_KEYS
                 tier = "exploratory" if is_exploratory else "primary"
